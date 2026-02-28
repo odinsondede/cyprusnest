@@ -5,140 +5,206 @@ import { type Locale, localeNames, localeFlags, locales, t } from '@/i18n/transl
 import ChatbotWidget from '@/components/ChatbotWidget';
 
 const content: Record<string, string> = {
-    tr: `# Yabancılar İçin KKTC Emlak Rehberi (2026)
+    tr: `# Yabancılar İçin KKTC Emlak Rehberi — Güncel 2025-2026
 
 ## KKTC'de Yabancı Mülk Alabilir mi?
 
-Evet! Yabancı uyruklu kişiler Kuzey Kıbrıs'ta mülk satın alabilir. Ancak bazı özel kurallar ve süreçler vardır.
+Evet! Yabancı uyruklu kişiler Kuzey Kıbrıs'ta mülk satın alabilir. Ancak 2025 yılında yürürlüğe giren yeni düzenlemelerle kurallar sıkılaştırılmıştır.
+
+## Yabancı Alıcı Limitleri (2025 Düzenlemesi)
+
+| Vatandaşlık | Daire Limiti | Villa Limiti | Arsa |
+|-------------|-------------|-------------|------|
+| TC Vatandaşı | 6 daire | 3 villa | Sınırsız |
+| Yabancı Uyruklu | Max 3 daire | Max 2 villa | Max 1 dönüm (1.338 m²) |
+| Şirket (KKTC tescilli) | Daha yüksek | Daha yüksek | Min €10M yatırım ile 80.280 m² |
+
+> ⚠️ Trustee (vekalet) düzenlemeleri artık YASADIŞI. Mevcut olanlar feshedilmek zorunda.
 
 ## Adım Adım Satın Alma Süreci
 
 ### 1. Mülk Seçimi
-- CyprusNest üzerinden ilanları inceleyin
-- AI chatbot'a sorularınızı sorun
-- WhatsApp ile emlakçıyla iletişime geçin
-- Mülkü yerinde görün (veya AI virtual staging ile uzaktan inceleyin)
+- İlanları inceleyin (CyprusNest, 101evler)
+- WhatsApp ile emlakçıyla iletişim kurun
+- Mülkü mutlaka yerinde görün
+- Tapu türünü sorun (Eşdeğer Koçan en güvenli)
 
 ### 2. Avukat Tutma (ZORUNLU)
 - Bağımsız bir KKTC avukatı tutun
 - Avukat tapu temizliğini kontrol eder
 - İpotek, haciz, borç kontrolü yapılır
 - Maliyet: £1.500 - £3.000
+- En az 3 avukattan teklif alın
 
 ### 3. Satış Sözleşmesi
 - Fiyat, ödeme planı, teslim tarihi belirlenir
 - Peşinat: genellikle %10-30
-- Sözleşme noter onaylı olmalı
+- Sözleşme 21 gün içinde Tapu Dairesi'ne kaydedilmelidir
+- Gecikirse ceza uygulanır
 
 ### 4. PTP Başvurusu (Satın Alma İzni)
-- Bakanlar Kurulu'na başvuru yapılır
-- Avukatınız bu süreci yönetir
-- Bekleme süresi: 6-12 ay
-- Onay oranı: çok yüksek (%95+)
+- Bakanlar Kurulu'na (İçişleri Bakanlığı) başvuru
+- Avukatınız online başvuru yapar
+- Bekleme süresi: **6-24 ay** (milliyete ve evrak durumuna göre)
 - PTP beklerken mülke taşınabilirsiniz
+- PTP başvuru ücreti: ~£250
+
+### Gerekli Belgeler
+- Pasaport fotokopisi
+- Tapu fotokopisi
+- Kayıtlı satış sözleşmesi
+- Vaziyet planı
+- Vatandaşı olduğu ülkeden sabıka kaydı (ikamet değil!)
+- İçişleri Bakanlığı'na dilekçe
 
 ### 5. Tapu Devri
-- PTP onaylandıktan sonra
-- Tapu Dairesi'nde resmi devir
-- Vergiler bu aşamada ödenir
+- PTP onayı Resmi Gazete'de yayımlandıktan sonra
+- **75 iş günü içinde** tüm vergi ve harçlar ödenmeli
+- Ödeme gecikirirse PTP iptal olur!
+- Tapu devri için 6 ay süre
 
-## Vergiler ve Maliyetler
+## Vergiler — Yabancılar İçin
 
-| Kalem | Oran | Açıklama |
-|-------|------|----------|
-| Damga Vergisi | %0.5 | Sözleşme imzasında |
-| KDV | %5 | Yeni binalar için |
-| Tapu Harcı | %6 | İlk mülk %3, ikinci %6 |
+| Kalem | Oran | Not |
+|-------|------|-----|
+| Damga Vergisi | %0.6 | Sözleşme imzasında (21 gün) |
+| KDV | %5 | Sadece yeni inşaat |
+| Tapu Harcı | %9 | %6 kayıt + %3 izin sonrası |
 | Avukat | %1-2 | Min £1.500 |
-| Toplam ek maliyet | ~%12-14 | Mülk fiyatının üzerine |
+| Toplam ek maliyet | ~%15-17 | Mülk fiyatının üzerine |
 
-## Hangi Tapu Türü Güvenli?
+## Tapu Türleri
 
-- ✅ **Türk Tapusu (Eşdeğer Koçan):** En güvenli
-- ⚠️ **Tahsis Tapusu:** Devlet tahsisi, kontrol et
-- ❌ **Rum Koçanı:** Riskli, avukatsız ALMA
+- ✅ **Türk Tapusu (Eşdeğer Koçan):** En güvenli, 1974 sonrası Türk devleti tarafından verilen
+- ⚠️ **Tahsis Tapusu:** Devlet arazisi üzerinde, dönüştürülebilir ama kontrol edin
+- ❌ **Rum Koçanı (Eski Eşdeğer):** Riskli — AB Mahkemesi kararları soruna yol açabilir
+- 📋 **Kat İrtifakı:** Bitmiş bina tapusu, güvenli
+
+## Alım Yasakları
+
+Yabancılar şunları ALAMAZ:
+- Tarım arazisi
+- Orman arazisi
+- Askeri bölge yakını mülkler
+- Kamu güvenliği açısından hassas bölgeler
+
+## Bölge bazında toplam yabancı mülk oranı da sınırlandırılmıştır:
+- İlçe bazında: max %7
+- Ülke genelinde: max %3
+- Proje bazında: max %80 yabancıya satılabilir
 
 ## En Çok Yatırım Yapılan Bölgeler
 
-1. **İskele / Long Beach** — En yüksek kira getirisi
-2. **Girne / Alsancak** — Premium yaşam
-3. **Gönyeli / Lefkoşa** — Öğrenci kiralama
-4. **Gazimağusa** — Uygun fiyat, EMU yakını
+1. **İskele / Long Beach** — En yüksek kira getirisi, yeni projeler
+2. **Girne / Alsancak** — Premium yaşam, turistik
+3. **Gönyeli / Lefkoşa** — Öğrenci kiralama, uygun fiyat
+4. **Gazimağusa** — DAÜ yakını, büyüyen bölge
+5. **Esentepe** — Lüks villalar, golf tesisleri
+6. **Lapta** — Doğa, deniz, sessiz yaşam
 
-## Kira Getirisi
-
-KKTC'de ortalama brüt kira getirisi: **%6-10/yıl**
-
-Bu oran İngiltere (%3-4), Almanya (%2-3) ve Rusya'ya (%4-5) göre çok yüksek.
+> ⚠️ Bu bilgiler 2025 Mayıs düzenlemesine dayanmaktadır. Yasal süreçler değişebilir. Mutlaka KKTC avukatına danışın.
 
 [👉 Yatırımlık İlanları Gör](/properties)
 [⚖️ Vergi Hesaplayıcıya Git](/legal)`,
 
-    en: `# Complete Guide to Buying Property in North Cyprus as a Foreigner (2026)
+    en: `# Complete Guide to Buying Property in North Cyprus as a Foreigner (2025-2026)
 
 ## Can Foreigners Buy Property in North Cyprus?
 
-Yes! Foreign nationals can purchase property in Northern Cyprus (TRNC). However, there are specific rules and processes to follow.
+Yes! Foreign nationals can purchase property in the TRNC. However, regulations tightened significantly in 2025 with new laws on ownership limits and purchase procedures.
+
+## Foreign Buyer Property Limits (2025 Regulation)
+
+| Citizenship | Apartment Limit | Villa Limit | Land |
+|------------|----------------|-------------|------|
+| Turkish Citizen | 6 apartments | 3 villas | Unlimited |
+| Foreign National | Max 3 apartments | Max 2 villas | Max 1 donum (1,338 m²) |
+| Company (TRNC registered) | Higher limits | Higher limits | Up to 80,280 m² with €10M+ investment |
+
+> ⚠️ Trustee arrangements are now ILLEGAL. Existing ones must be dissolved.
 
 ## Step-by-Step Purchase Process
 
 ### 1. Property Selection
-- Browse listings on CyprusNest
-- Ask our AI chatbot any questions
-- Contact agents directly via WhatsApp
-- View properties in person (or remotely with AI virtual staging)
+- Browse listings (CyprusNest, 101evler)
+- Contact agents via WhatsApp
+- Always visit the property in person
+- Ask about title deed type (Turkish Title is safest)
 
 ### 2. Hire a Lawyer (ESSENTIAL)
 - Engage an independent TRNC lawyer
 - Lawyer verifies title deed authenticity
-- Checks for mortgages, liens, outstanding debts
+- Checks for mortgages, liens, debts
 - Cost: £1,500 - £3,000
+- Get quotes from at least 3 lawyers
 
 ### 3. Sales Contract
 - Price, payment plan, delivery date agreed
 - Deposit: typically 10-30%
-- Contract must be notarized
+- Contract must be registered at Land Registry within 21 days
+- Late registration incurs penalties
 
 ### 4. PTP Application (Permission to Purchase)
-- Application to the Council of Ministers
-- Your lawyer manages this process
-- Waiting period: 6-12 months
-- Approval rate: very high (95%+)
-- You can move into the property while waiting for PTP
+- Application to Council of Ministers (Ministry of Interior)
+- Your lawyer handles the online application
+- Waiting period: **6-24 months** (varies by nationality and paperwork)
+- You can move into the property while waiting
+- PTP application fee: ~£250
+
+### Required Documents
+- Passport copy
+- Title deed copy
+- Registered sales contract
+- Site plan
+- Police clearance from country of CITIZENSHIP (not residence!)
+- Formal letter to Ministry of Interior
 
 ### 5. Title Deed Transfer
-- After PTP approval
-- Official transfer at Land Registry Office
-- Taxes paid at this stage
+- After PTP approval is published in the Official Gazette
+- **All taxes must be paid within 75 working days**
+- Late payment = PTP cancellation!
+- 6 months to complete transfer
 
-## Taxes and Costs
+## Taxes — For Foreign Buyers
 
-| Item | Rate | Description |
-|------|------|-------------|
-| Stamp Duty | 0.5% | At contract signing |
-| VAT | 5% | New build properties only |
-| Transfer Tax | 6% | First property 3%, second 6% |
-| Lawyer | 1-2% | Minimum £1,500 |
-| Total extra cost | ~12-14% | On top of property price |
+| Item | Rate | Note |
+|------|------|------|
+| Stamp Duty | 0.6% | At contract signing (21 days) |
+| VAT | 5% | New build only |
+| Transfer Tax | 9% | 6% at registration + 3% after permit |
+| Lawyer | 1-2% | Min £1,500 |
+| Total extra cost | ~15-17% | On top of property price |
 
-## Which Title Deed Type is Safe?
+## Title Deed Types
 
-- ✅ **Turkish Title (Eşdeğer Koçan):** Most secure
-- ⚠️ **Allocation Title (Tahsis):** Government allocated, verify carefully
-- ❌ **Greek Cypriot Title:** Risky, never buy without legal advice
+- ✅ **Turkish Title (Eşdeğer Koçan):** Most secure, issued by Turkish state post-1974
+- ⚠️ **Allocation Title (Tahsis):** Government land, can be converted but verify
+- ❌ **Greek Cypriot Title:** Risky — EU court rulings may cause problems
+- 📋 **Condominium Title (Kat İrtifakı):** Completed building title, safe
+
+## Purchase Restrictions
+
+Foreigners CANNOT buy:
+- Agricultural land
+- Forest land
+- Properties near military zones
+- Areas deemed important for public security/order
+
+## Regional ownership caps:
+- Per district: max 7% foreign ownership
+- Nationwide: max 3% foreign ownership
+- Per project: max 80% of units can be sold to foreigners
 
 ## Top Investment Areas
 
-1. **Iskele / Long Beach** — Highest rental yield
-2. **Kyrenia / Alsancak** — Premium living
-3. **Gönyeli / Nicosia** — Student rental market
-4. **Famagusta** — Affordable, near EMU
+1. **Iskele / Long Beach** — Highest yields, new projects
+2. **Kyrenia / Alsancak** — Premium living, touristic
+3. **Gönyeli / Nicosia** — Student rental, affordable
+4. **Famagusta** — Near EMU, growing area
+5. **Esentepe** — Luxury villas, golf courses
+6. **Lapta** — Nature, sea, quiet living
 
-## Rental Yield
-
-Average gross rental yield in TRNC: **6-10% per year**
-
-This compares favorably to the UK (3-4%), Germany (2-3%), and Russia (4-5%).
+> ⚠️ This information is based on the May 2025 regulation. Legal processes may change. Always consult a TRNC lawyer.
 
 [👉 View Investment Properties](/properties)
 [⚖️ Go to Tax Calculator](/legal)`,
