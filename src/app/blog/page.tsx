@@ -171,9 +171,11 @@ export default function BlogPage() {
                     {/* Featured */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px', marginBottom: '48px' }}>
                         {posts.filter(p => p.featured).map(post => (
-                            <article
+                            <a
+                                href={`/blog/${post.slug}`}
                                 key={post.id}
                                 style={{
+                                    textDecoration: 'none', color: 'inherit',
                                     background: 'var(--bg-card)',
                                     border: '1px solid var(--border)',
                                     borderRadius: 'var(--radius-lg)',
@@ -206,7 +208,7 @@ export default function BlogPage() {
                                     <span>📅 {post.date}</span>
                                     <span>⏱️ {post.readTime}</span>
                                 </div>
-                            </article>
+                            </a>
                         ))}
                     </div>
 
@@ -216,9 +218,11 @@ export default function BlogPage() {
                     </h2>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '64px' }}>
                         {posts.map(post => (
-                            <article
+                            <a
+                                href={`/blog/${post.slug}`}
                                 key={post.id}
                                 style={{
+                                    textDecoration: 'none', color: 'inherit',
                                     display: 'flex', gap: '20px', alignItems: 'center',
                                     background: 'var(--bg-card)', border: '1px solid var(--border)',
                                     borderRadius: 'var(--radius-md)', padding: '20px',
@@ -237,7 +241,7 @@ export default function BlogPage() {
                                     </p>
                                 </div>
                                 <span style={{ color: 'var(--primary-light)', fontSize: '1.2rem' }}>→</span>
-                            </article>
+                            </a>
                         ))}
                     </div>
                 </div>
