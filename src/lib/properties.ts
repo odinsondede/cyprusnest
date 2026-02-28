@@ -69,13 +69,14 @@ export async function getCities(): Promise<string[]> {
 }
 
 export async function incrementViews(propertyId: string) {
-    await supabase.rpc('increment_views', { prop_id: propertyId }).catch(() => {
-        // Fallback: direct update
-        supabase
+    try {
+        await supabase
             .from('properties')
-            .update({ views_count: supabase.rpc ? undefined : 0 })
+            .update({ views_count: 1 })
             .eq('id', propertyId);
-    });
+    } catch {
+        // silently fail
+    }
 }
 
 export function formatPrice(price: number, currency: string = 'GBP'): string {
