@@ -41,11 +41,13 @@ function getLegalSteps(nationality: string, purpose: string, locale: string): st
         ];
         if (isForeign) {
             steps.push(
-                '4️⃣ Bakanlık\'a PTP (Satın Alma İzni) başvurusu',
-                '5️⃣ PTP onay bekleme süresi: 6-12 ay',
-                '6️⃣ Tapu devir işlemi + vergiler',
-                '7️⃣ Tapu Dairesi\'nde tescil',
-                '⚠️ Yabancı uyruklu kişiler max 1 dönüm arazi alabilir (yeni düzenleme 2024)',
+                '4️⃣ Sözleşmeyi 21 gün içinde Tapu Dairesi\'ne kaydedin',
+                '5️⃣ Bakanlık\'a PTP (Satın Alma İzni) başvurusu',
+                '6️⃣ PTP onay bekleme süresi: 6-24 ay (milliyete göre değişir)',
+                '7️⃣ PTP sonrası 75 iş günü içinde tüm vergileri öde',
+                '8️⃣ Tapu devir işlemi',
+                '⚠️ Yabancılar max 3 daire veya 2 villa alabilir (2025 düzenlemesi)',
+                '⚠️ Trustee (vekalet) düzenlemeleri artık YASADIŞI',
             );
             if (nationality === 'russian') {
                 steps.push('📋 Ek: Rusya vatandaşları için notere onaylı pasaport çevirisi gerekli');
@@ -68,11 +70,13 @@ function getLegalSteps(nationality: string, purpose: string, locale: string): st
     ];
     if (isForeign) {
         steps.push(
-            '4️⃣ Apply for PTP (Permission to Purchase) at the Ministry',
-            '5️⃣ PTP approval waiting period: 6-12 months',
-            '6️⃣ Title deed transfer + taxes',
-            '7️⃣ Registration at the Land Registry Office',
-            '⚠️ Foreigners can purchase max 1 donum of land (2024 regulation)',
+            '4️⃣ Register contract at Land Registry within 21 days',
+            '5️⃣ Apply for PTP (Permission to Purchase) at the Ministry',
+            '6️⃣ PTP approval waiting period: 6-24 months (varies by nationality)',
+            '7️⃣ Pay all taxes within 75 working days after PTP',
+            '8️⃣ Title deed transfer',
+            '⚠️ Foreigners can purchase max 3 apartments or 2 villas (2025 regulation)',
+            '⚠️ Trustee arrangements are now ILLEGAL',
         );
         if (nationality === 'russian') {
             steps.push('📋 Note: Russian citizens need notarized passport translation');
@@ -88,14 +92,14 @@ function getLegalSteps(nationality: string, purpose: string, locale: string): st
 }
 
 function calculateTax(price: number, isForeign: boolean) {
-    const stampDuty = price * 0.005; // %0.5
-    const vatRate = isForeign ? 0.05 : 0.05; // %5
+    const stampDuty = price * (isForeign ? 0.006 : 0.005); // %0.5 vatandaş, %0.6 yabancı
+    const vatRate = 0.05; // %5 yeni binalar
     const vat = price * vatRate;
-    const transferTax = price * 0.06; // %6 (first property 3%)
-    const lawyerFee = Math.max(price * 0.01, 1500); // %1 min £1500
+    const transferTax = price * (isForeign ? 0.09 : 0.06); // %9 yabancı, %6 TC ilk mülk
+    const lawyerFee = Math.max(price * (isForeign ? 0.015 : 0.01), 1500); // yabancı %1.5, TC %1
     const total = stampDuty + vat + transferTax + lawyerFee;
 
-    return { stampDuty, vat, transferTax, lawyerFee, total, vatRate: vatRate * 100 };
+    return { stampDuty, vat, transferTax, lawyerFee, total, vatRate: vatRate * 100, stampRate: isForeign ? 0.6 : 0.5, transferRate: isForeign ? 9 : 6 };
 }
 
 export default function LegalWizardPage() {
