@@ -1,66 +1,62 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { type Locale, localeNames, localeFlags, locales, t } from '@/i18n/translations';
 import './properties.css';
-import { sampleProperties, formatPrice, getScoreColor, type Property } from '@/data/properties';
+import { getProperties, formatPrice, getScoreColor } from '@/lib/properties';
+import { type Property } from '@/lib/supabase';
 import ChatbotWidget from '@/components/ChatbotWidget';
 
 function PropertyCard({ property, locale }: { property: Property; locale: Locale }) {
-    const title = property.title[locale] || property.title['en'];
-    const desc = property.description[locale] || property.description['en'];
+    const title = locale === 'tr' ? property.title_tr : property.title_en;
+    const isRent = property.type === 'rent';
 
     return (
         <a href={`/properties/${property.id}`} className="property-card">
-            {/* Image placeholder */}
             <div className="property-image">
                 <div className="property-image-placeholder">
-                    {property.propertyType === 'villa' ? '🏡' :
-                        property.propertyType === 'penthouse' ? '🏢' :
-                            property.propertyType === 'studio' ? '🏠' :
-                                property.propertyType === 'land' ? '🌿' : '🏢'}
+                    {property.bedrooms >= 4 ? '🏡' :
+                        property.bedrooms === 0 ? '🏠' :
+                            property.area_sqm > 150 ? '🏢' : '🏢'}
                 </div>
                 <div className="property-badges">
                     <span className={`badge badge-${property.type}`}>
-                        {property.type === 'rent' ? (locale === 'tr' ? 'Kiralık' : 'Rent') : (locale === 'tr' ? 'Satılık' : 'Sale')}
+                        {isRent ? (locale === 'tr' ? 'Kiralık' : 'Rent') : (locale === 'tr' ? 'Satılık' : 'Sale')}
                     </span>
-                    {property.isNew && <span className="badge badge-new">{locale === 'tr' ? 'Yeni' : 'New'}</span>}
-                    {property.isFeatured && <span className="badge badge-featured">⭐</span>}
+                    {property.furnished && <span className="badge badge-new">{locale === 'tr' ? 'Eşyalı' : 'Furnished'}</span>}
                 </div>
-                <div className="property-score" style={{ borderColor: getScoreColor(property.score) }}>
-                    <span style={{ color: getScoreColor(property.score) }}>{property.score}</span>
-                </div>
+                {property.cyprusnest_score && (
+                    <div className="property-score" style={{ borderColor: getScoreColor(property.cyprusnest_score) }}>
+                        <span style={{ color: getScoreColor(property.cyprusnest_score) }}>{property.cyprusnest_score}</span>
+                    </div>
+                )}
             </div>
 
-            {/* Content */}
             <div className="property-content">
                 <div className="property-price">
-                    {formatPrice(property.price, property.currency, property.priceLabel)}
+                    {formatPrice(property.price, property.currency)}
+                    {isRent && <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>/mo</span>}
                 </div>
                 <h3 className="property-title">{title}</h3>
-                <p className="property-location">📍 {property.location.district}, {property.location.city}</p>
-                <p className="property-desc">{desc}</p>
+                <p className="property-location">📍 {property.district}, {property.city}</p>
 
                 <div className="property-meta">
                     <span>🛏️ {property.bedrooms}</span>
                     <span>🚿 {property.bathrooms}</span>
-                    <span>📐 {property.area}m²</span>
+                    <span>📐 {property.area_sqm}m²</span>
                 </div>
 
                 <div className="property-features">
-                    {property.features.slice(0, 3).map((f) => (
+                    {(property.features || []).slice(0, 3).map((f: string) => (
                         <span key={f} className="feature-tag">{f}</span>
                     ))}
-                    {property.features.length > 3 && (
+                    {(property.features || []).length > 3 && (
                         <span className="feature-tag feature-more">+{property.features.length - 3}</span>
                     )}
                 </div>
 
                 <div className="property-agent">
-                    <span className="agent-name">
-                        {property.agent.verified && '✅ '}{property.agent.name}
-                    </span>
-                    <span className="agent-company">{property.agent.company}</span>
+                    <span className="agent-name">👁️ {property.views_count} {locale === 'tr' ? 'görüntüleme' : 'views'}</span>
                 </div>
             </div>
         </a>
@@ -73,44 +69,31 @@ export default function PropertiesPage() {
     const [cityFilter, setCityFilter] = useState<string>('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState<'newest' | 'price-low' | 'price-high' | 'score'>('newest');
+    const [properties, setProperties] = useState<Property[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchData() {
+            setLoading(true);
+            const data = await getProperties({
+                type: typeFilter === 'all' ? undefined : typeFilter,
+                city: cityFilter === 'all' ? undefined : cityFilter,
+                search: searchQuery || undefined,
+                sortBy,
+            });
+            setProperties(data);
+            setLoading(false);
+        }
+        fetchData();
+    }, [typeFilter, cityFilter, searchQuery, sortBy]);
 
     const cities = useMemo(() => {
-        const c = new Set(sampleProperties.map(p => p.location.city));
+        const c = new Set(properties.map(p => p.city));
         return Array.from(c);
-    }, []);
-
-    const filtered = useMemo(() => {
-        let result = sampleProperties;
-
-        if (typeFilter !== 'all') {
-            result = result.filter(p => p.type === typeFilter);
-        }
-        if (cityFilter !== 'all') {
-            result = result.filter(p => p.location.city === cityFilter);
-        }
-        if (searchQuery) {
-            const q = searchQuery.toLowerCase();
-            result = result.filter(p =>
-                (p.title[locale] || p.title['en']).toLowerCase().includes(q) ||
-                p.location.district.toLowerCase().includes(q) ||
-                p.location.city.toLowerCase().includes(q)
-            );
-        }
-
-        switch (sortBy) {
-            case 'price-low': result = [...result].sort((a, b) => a.price - b.price); break;
-            case 'price-high': result = [...result].sort((a, b) => b.price - a.price); break;
-            case 'score': result = [...result].sort((a, b) => b.score - a.score); break;
-            default: result = [...result].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        }
-
-        return result;
-    }, [typeFilter, cityFilter, searchQuery, sortBy, locale]);
-
-    const dir = locale === 'ar' ? 'rtl' : 'ltr';
+    }, [properties]);
 
     return (
-        <div dir={dir}>
+        <div>
             <nav className="navbar">
                 <div className="container">
                     <a href="/" className="navbar-logo">
@@ -118,91 +101,92 @@ export default function PropertiesPage() {
                         <span className="logo-text">CyprusNest</span>
                     </a>
                     <ul className="navbar-links">
-                        <li><a href="/properties?type=rent">{t(locale, 'nav.rent')}</a></li>
-                        <li><a href="/properties?type=sale">{t(locale, 'nav.buy')}</a></li>
-                        <li><a href="#staging">{t(locale, 'nav.staging')}</a></li>
-                        <li><a href="#legal">{t(locale, 'nav.legal')}</a></li>
+                        <li><a href="/properties" style={{ color: 'var(--primary-light)' }}>{t(locale, 'nav.rent')}</a></li>
+                        <li><a href="/properties">{t(locale, 'nav.buy')}</a></li>
+                        <li><a href="/legal">{t(locale, 'nav.legal')}</a></li>
+                        <li><a href="/blog">Blog</a></li>
                     </ul>
                     <div className="navbar-right">
                         <select className="lang-selector" value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
                             {locales.map((l) => (<option key={l} value={l}>{localeFlags[l]} {localeNames[l]}</option>))}
                         </select>
-                        <button className="btn btn-ghost">{t(locale, 'nav.login')}</button>
-                        <button className="btn btn-primary">{t(locale, 'nav.register')}</button>
+                        <button className="btn btn-outline btn-sm" onClick={() => alert(locale === 'tr' ? '🚧 Yakında aktif olacak!' : '🚧 Coming soon!')}>
+                            {t(locale, 'nav.login')}
+                        </button>
                     </div>
                 </div>
             </nav>
 
-            <main className="properties-page">
+            <main style={{ paddingTop: '100px', paddingBottom: '64px', minHeight: '100vh' }}>
                 <div className="container">
+                    <div style={{ marginBottom: '32px' }}>
+                        <h1 style={{ fontSize: '1.8rem', color: 'var(--text-primary)', marginBottom: '8px' }}>
+                            {locale === 'tr' ? '🏠 Kuzey Kıbrıs Emlak İlanları' : '🏠 North Cyprus Property Listings'}
+                        </h1>
+                        <p style={{ color: 'var(--text-muted)' }}>
+                            {loading ? (locale === 'tr' ? 'Yükleniyor...' : 'Loading...') :
+                                `${properties.length} ${locale === 'tr' ? 'ilan bulundu' : 'properties found'}`}
+                        </p>
+                    </div>
+
                     {/* Filters */}
-                    <div className="filters-bar">
-                        <div className="filters-row">
-                            <input
-                                type="text"
-                                className="filter-search"
-                                placeholder={t(locale, 'hero.searchPlaceholder')}
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-
-                            <div className="filter-group">
-                                <button
-                                    className={`filter-btn ${typeFilter === 'all' ? 'active' : ''}`}
-                                    onClick={() => setTypeFilter('all')}
-                                >
-                                    {locale === 'tr' ? 'Tümü' : 'All'}
-                                </button>
-                                <button
-                                    className={`filter-btn ${typeFilter === 'rent' ? 'active' : ''}`}
-                                    onClick={() => setTypeFilter('rent')}
-                                >
-                                    🔑 {t(locale, 'nav.rent')}
-                                </button>
-                                <button
-                                    className={`filter-btn ${typeFilter === 'sale' ? 'active' : ''}`}
-                                    onClick={() => setTypeFilter('sale')}
-                                >
-                                    🏷️ {t(locale, 'nav.buy')}
-                                </button>
-                            </div>
-
-                            <select className="filter-select" value={cityFilter} onChange={(e) => setCityFilter(e.target.value)}>
-                                <option value="all">{locale === 'tr' ? 'Tüm Şehirler' : 'All Cities'}</option>
-                                {cities.map(c => (<option key={c} value={c}>{c}</option>))}
-                            </select>
-
-                            <select className="filter-select" value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)}>
-                                <option value="newest">{locale === 'tr' ? 'En Yeni' : 'Newest'}</option>
-                                <option value="price-low">{locale === 'tr' ? 'Fiyat ↑' : 'Price ↑'}</option>
-                                <option value="price-high">{locale === 'tr' ? 'Fiyat ↓' : 'Price ↓'}</option>
-                                <option value="score">{locale === 'tr' ? 'Puan ↓' : 'Score ↓'}</option>
-                            </select>
-                        </div>
-
-                        <div className="results-count">
-                            {filtered.length} {locale === 'tr' ? 'sonuç bulundu' : 'results found'}
-                        </div>
+                    <div className="filters-bar" style={{
+                        display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap',
+                        padding: '16px', background: 'var(--bg-card)', border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius-lg)',
+                    }}>
+                        <input
+                            type="text"
+                            placeholder={locale === 'tr' ? '🔍 Ara: bölge, şehir...' : '🔍 Search: area, city...'}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{
+                                flex: 1, minWidth: '200px', padding: '8px 12px',
+                                background: 'var(--bg-darker)', border: '1px solid var(--border)',
+                                borderRadius: 'var(--radius-md)', color: 'var(--text-primary)',
+                            }}
+                        />
+                        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as 'all' | 'rent' | 'sale')}
+                            style={{ padding: '8px 12px', background: 'var(--bg-darker)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)' }}>
+                            <option value="all">{locale === 'tr' ? 'Tümü' : 'All'}</option>
+                            <option value="rent">{locale === 'tr' ? 'Kiralık' : 'Rent'}</option>
+                            <option value="sale">{locale === 'tr' ? 'Satılık' : 'Sale'}</option>
+                        </select>
+                        <select value={cityFilter} onChange={(e) => setCityFilter(e.target.value)}
+                            style={{ padding: '8px 12px', background: 'var(--bg-darker)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)' }}>
+                            <option value="all">{locale === 'tr' ? 'Tüm Şehirler' : 'All Cities'}</option>
+                            {cities.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                        <select value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                            style={{ padding: '8px 12px', background: 'var(--bg-darker)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)' }}>
+                            <option value="newest">{locale === 'tr' ? '🕐 En Yeni' : '🕐 Newest'}</option>
+                            <option value="price-low">{locale === 'tr' ? '💰 Fiyat ↑' : '💰 Price ↑'}</option>
+                            <option value="price-high">{locale === 'tr' ? '💰 Fiyat ↓' : '💰 Price ↓'}</option>
+                            <option value="score">{locale === 'tr' ? '⭐ Puan' : '⭐ Score'}</option>
+                        </select>
                     </div>
 
                     {/* Property Grid */}
-                    <div className="properties-grid">
-                        {filtered.map((property) => (
-                            <PropertyCard key={property.id} property={property} locale={locale} />
-                        ))}
-                    </div>
-
-                    {filtered.length === 0 && (
-                        <div className="no-results">
-                            <div className="no-results-icon">🔍</div>
-                            <h3>{locale === 'tr' ? 'Sonuç bulunamadı' : 'No results found'}</h3>
-                            <p>{locale === 'tr' ? 'Filtrelerinizi değiştirmeyi deneyin' : 'Try adjusting your filters'}</p>
+                    {loading ? (
+                        <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
+                            <div style={{ fontSize: '2rem', marginBottom: '12px' }}>⏳</div>
+                            <p>{locale === 'tr' ? 'İlanlar yükleniyor...' : 'Loading properties...'}</p>
+                        </div>
+                    ) : properties.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
+                            <div style={{ fontSize: '2rem', marginBottom: '12px' }}>🔍</div>
+                            <p>{locale === 'tr' ? 'İlan bulunamadı' : 'No properties found'}</p>
+                        </div>
+                    ) : (
+                        <div className="properties-grid">
+                            {properties.map((p) => (
+                                <PropertyCard key={p.id} property={p} locale={locale} />
+                            ))}
                         </div>
                     )}
                 </div>
             </main>
 
-            {/* AI Chatbot */}
             <ChatbotWidget locale={locale} />
         </div>
     );
