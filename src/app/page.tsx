@@ -38,8 +38,8 @@ export default function Home() {
                 </option>
               ))}
             </select>
-            <button className="btn btn-ghost">{t(locale, 'nav.login')}</button>
-            <button className="btn btn-primary">{t(locale, 'nav.register')}</button>
+            <button className="btn btn-ghost" onClick={() => alert(locale === 'tr' ? 'Giriş sistemi çok yakında! 🚀' : 'Login system coming very soon! 🚀')}>{t(locale, 'nav.login')}</button>
+            <button className="btn btn-primary" onClick={() => alert(locale === 'tr' ? 'Kayıt sistemi çok yakında! 🚀' : 'Registration coming very soon! 🚀')}>{t(locale, 'nav.register')}</button>
           </div>
         </div>
       </nav>
@@ -56,21 +56,21 @@ export default function Home() {
 
           <p className="hero-subtitle">{t(locale, 'hero.subtitle')}</p>
 
-          <div className="hero-search">
+          <form className="hero-search" onSubmit={(e) => { e.preventDefault(); window.location.href = '/properties'; }}>
             <input
               type="text"
               placeholder={t(locale, 'hero.searchPlaceholder')}
             />
-            <button>{t(locale, 'hero.ctaSearch')}</button>
-          </div>
+            <button type="submit">{t(locale, 'hero.ctaSearch')}</button>
+          </form>
 
           <div className="hero-actions">
-            <button className="btn btn-primary btn-lg">
+            <a href="/properties" className="btn btn-primary btn-lg">
               🔍 {t(locale, 'hero.ctaSearch')}
-            </button>
-            <button className="btn btn-outline btn-lg">
+            </a>
+            <a href="/properties" className="btn btn-outline btn-lg">
               🤖 {t(locale, 'hero.ctaChat')}
-            </button>
+            </a>
           </div>
 
           <div className="hero-stats">

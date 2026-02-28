@@ -252,6 +252,20 @@ export default function LegalWizardPage() {
                                         <div className="tax-value" style={{ fontSize: '1.5rem' }}>£{taxes.total.toLocaleString()}</div>
                                         <div className="tax-label">{locale === 'tr' ? 'Toplam Tahmini Maliyet' : 'Total Estimated Cost'}</div>
                                     </div>
+                                    <p style={{
+                                        marginTop: '16px',
+                                        padding: '12px',
+                                        fontSize: '0.75rem',
+                                        color: 'var(--text-muted)',
+                                        background: 'rgba(255, 200, 50, 0.05)',
+                                        border: '1px solid rgba(255, 200, 50, 0.15)',
+                                        borderRadius: 'var(--radius-md)',
+                                        lineHeight: 1.5,
+                                    }}>
+                                        ⚠️ {locale === 'tr'
+                                            ? 'Bu hesaplamalar genel bilgi amaçlıdır ve hukuki tavsiye niteliği taşımaz. Kesin maliyetler için mutlaka bir KKTC avukatına danışın.'
+                                            : 'These calculations are for informational purposes only and do not constitute legal advice. Consult a TRNC lawyer for exact costs.'}
+                                    </p>
                                 </div>
 
                                 <div className="wizard-actions">
