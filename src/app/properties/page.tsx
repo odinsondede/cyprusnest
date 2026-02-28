@@ -5,7 +5,9 @@ import { type Locale, localeNames, localeFlags, locales, t } from '@/i18n/transl
 import './properties.css';
 import { getProperties, formatPrice, getScoreColor } from '@/lib/properties';
 import { type Property } from '@/lib/supabase';
+import { getCurrentUser, signOut, onAuthChange } from '@/lib/auth';
 import ChatbotWidget from '@/components/ChatbotWidget';
+import AuthModal from '@/components/AuthModal';
 
 function PropertyCard({ property, locale }: { property: Property; locale: Locale }) {
     const title = locale === 'tr' ? property.title_tr : property.title_en;
@@ -71,6 +73,14 @@ export default function PropertiesPage() {
     const [sortBy, setSortBy] = useState<'newest' | 'price-low' | 'price-high' | 'score'>('newest');
     const [properties, setProperties] = useState<Property[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showAuth, setShowAuth] = useState(false);
+    const [user, setUser] = useState<unknown>(null);
+
+    useEffect(() => {
+        getCurrentUser().then(u => setUser(u));
+        const { data: { subscription } } = onAuthChange((u) => setUser(u));
+        return () => subscription.unsubscribe();
+    }, []);
 
     useEffect(() => {
         async function fetchData() {
@@ -110,9 +120,15 @@ export default function PropertiesPage() {
                         <select className="lang-selector" value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
                             {locales.map((l) => (<option key={l} value={l}>{localeFlags[l]} {localeNames[l]}</option>))}
                         </select>
-                        <button className="btn btn-outline btn-sm" onClick={() => alert(locale === 'tr' ? '🚧 Yakında aktif olacak!' : '🚧 Coming soon!')}>
-                            {t(locale, 'nav.login')}
-                        </button>
+                        {user ? (
+                            <button className="btn btn-outline btn-sm" onClick={async () => { await signOut(); setUser(null); }}>
+                                🚪 {locale === 'tr' ? 'Çıkış' : 'Logout'}
+                            </button>
+                        ) : (
+                            <button className="btn btn-primary btn-sm" onClick={() => setShowAuth(true)}>
+                                {t(locale, 'nav.login')}
+                            </button>
+                        )}
                     </div>
                 </div>
             </nav>
@@ -187,6 +203,7 @@ export default function PropertiesPage() {
                 </div>
             </main>
 
+            <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} locale={locale} />
             <ChatbotWidget locale={locale} />
         </div>
     );
