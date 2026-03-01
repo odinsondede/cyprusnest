@@ -6,10 +6,11 @@ import './properties.css';
 import { getProperties, formatPrice, getScoreColor } from '@/lib/properties';
 import { type Property } from '@/lib/supabase';
 import { getCurrentUser, signOut, onAuthChange } from '@/lib/auth';
+import { getFavorites, toggleFavorite } from '@/lib/favorites';
 import ChatbotWidget from '@/components/ChatbotWidget';
 import AuthModal from '@/components/AuthModal';
 
-function PropertyCard({ property, locale }: { property: Property; locale: Locale }) {
+function PropertyCard({ property, locale, isFav, onToggleFav }: { property: Property; locale: Locale; isFav: boolean; onToggleFav: () => void }) {
     const title = locale === 'tr' ? property.title_tr : property.title_en;
     const isRent = property.type === 'rent';
 
@@ -32,6 +33,16 @@ function PropertyCard({ property, locale }: { property: Property; locale: Locale
                         <span style={{ color: getScoreColor(property.cyprusnest_score) }}>{property.cyprusnest_score}</span>
                     </div>
                 )}
+                <button
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFav(); }}
+                    style={{
+                        position: 'absolute', top: '12px', right: '12px', background: 'rgba(0,0,0,0.5)',
+                        border: 'none', borderRadius: '50%', width: '36px', height: '36px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', fontSize: '1.1rem', transition: 'transform 0.2s',
+                    }}
+                    title={locale === 'tr' ? 'Favorile' : 'Favorite'}
+                >{isFav ? '❤️' : '🤍'}</button>
             </div>
 
             <div className="property-content">
@@ -74,13 +85,19 @@ export default function PropertiesPage() {
     const [properties, setProperties] = useState<Property[]>([]);
     const [loading, setLoading] = useState(true);
     const [showAuth, setShowAuth] = useState(false);
-    const [user, setUser] = useState<unknown>(null);
+    const [user, setUser] = useState<{ id: string } | null>(null);
+    const [favIds, setFavIds] = useState<string[]>([]);
 
     useEffect(() => {
-        getCurrentUser().then(u => setUser(u));
-        const { data: { subscription } } = onAuthChange((u) => setUser(u));
+        getCurrentUser().then(u => setUser(u as { id: string } | null));
+        const { data: { subscription } } = onAuthChange((u) => setUser(u as { id: string } | null));
         return () => subscription.unsubscribe();
     }, []);
+
+    useEffect(() => {
+        if (user) getFavorites(user.id).then(setFavIds);
+        else setFavIds([]);
+    }, [user]);
 
     useEffect(() => {
         async function fetchData() {
@@ -201,7 +218,17 @@ export default function PropertiesPage() {
                     ) : (
                         <div className="properties-grid">
                             {properties.map((p) => (
-                                <PropertyCard key={p.id} property={p} locale={locale} />
+                                <PropertyCard
+                                    key={p.id}
+                                    property={p}
+                                    locale={locale}
+                                    isFav={favIds.includes(p.id)}
+                                    onToggleFav={async () => {
+                                        if (!user) { setShowAuth(true); return; }
+                                        const nowFav = await toggleFavorite(user.id, p.id);
+                                        setFavIds(prev => nowFav ? [...prev, p.id] : prev.filter(id => id !== p.id));
+                                    }}
+                                />
                             ))}
                         </div>
                     )}
