@@ -46,9 +46,14 @@ export default function Navbar({ locale, onLocaleChange, activePage }: NavbarPro
                             {locales.map((l) => (<option key={l} value={l}>{localeFlags[l]} {localeNames[l]}</option>))}
                         </select>
                         {user ? (
-                            <button className="btn btn-outline btn-sm" onClick={async () => { await signOut(); setUser(null); }}>
-                                🚪 {locale === 'tr' ? 'Çıkış' : 'Logout'}
-                            </button>
+                            <>
+                                <a href="/profile" className="btn btn-outline btn-sm" style={activePage === 'profile' as unknown ? { borderColor: 'var(--primary)' } : {}}>
+                                    👤 {locale === 'tr' ? 'Profil' : 'Profile'}
+                                </a>
+                                <button className="btn btn-outline btn-sm" onClick={async () => { await signOut(); setUser(null); }}>
+                                    🚪 {locale === 'tr' ? 'Çıkış' : 'Logout'}
+                                </button>
+                            </>
                         ) : (
                             <button className="btn btn-primary btn-sm" onClick={() => setShowAuth(true)}>
                                 {t(locale, 'nav.login')}
