@@ -32,6 +32,17 @@ export async function signInWithGoogle() {
     return { error: null };
 }
 
+export async function signInWithFacebook() {
+    const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'facebook',
+        options: {
+            redirectTo: `${window.location.origin}/properties`,
+        },
+    });
+    if (error) return { error: error.message };
+    return { error: null };
+}
+
 export async function resetPassword(email: string) {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/properties`,
