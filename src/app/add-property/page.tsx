@@ -13,23 +13,42 @@ import '../properties/properties.css';
 
 const cities = ['Lefkoşa', 'Girne', 'Gazimağusa', 'İskele', 'Güzelyurt', 'Lefke'];
 
-const propertyTypes = [
-    { value: 'apartment', tr: '🏢 Daire', en: '🏢 Apartment' },
-    { value: 'villa', tr: '🏡 Villa', en: '🏡 Villa' },
-    { value: 'detached', tr: '🏠 Müstakil Ev', en: '🏠 Detached House' },
-    { value: 'penthouse', tr: '🌆 Penthouse', en: '🌆 Penthouse' },
-    { value: 'studio', tr: '🛏️ Stüdyo', en: '🛏️ Studio' },
-    { value: 'land', tr: '🌍 Arsa', en: '🌍 Land' },
-    { value: 'commercial', tr: '🏪 Dükkan/Ofis', en: '🏪 Shop/Office' },
-    { value: 'duplex', tr: '🔀 Dubleks', en: '🔀 Duplex' },
+const propertyTypeGroups = [
+    {
+        label: { tr: '🏠 Konut', en: '🏠 Residential' },
+        types: [
+            { value: 'apartment', tr: 'Daire', en: 'Apartment' },
+            { value: 'villa', tr: 'Villa', en: 'Villa' },
+            { value: 'detached', tr: 'Müstakil Ev', en: 'Detached' },
+            { value: 'penthouse', tr: 'Penthouse', en: 'Penthouse' },
+            { value: 'studio', tr: 'Stüdyo', en: 'Studio' },
+            { value: 'duplex', tr: 'Dubleks', en: 'Duplex' },
+        ],
+    },
+    {
+        label: { tr: '🏪 Ticari', en: '🏪 Commercial' },
+        types: [
+            { value: 'shop', tr: 'Dükkan', en: 'Shop' },
+            { value: 'office', tr: 'Ofis', en: 'Office' },
+            { value: 'warehouse', tr: 'Depo', en: 'Warehouse' },
+        ],
+    },
+    {
+        label: { tr: '🌍 Arsa', en: '🌍 Land' },
+        types: [
+            { value: 'residential_land', tr: 'Konut Arsası', en: 'Residential Land' },
+            { value: 'commercial_land', tr: 'Ticari Arsa', en: 'Commercial Land' },
+            { value: 'farmland', tr: 'Tarla', en: 'Farmland' },
+        ],
+    },
 ];
+
+const isLandType = (t: string) => ['residential_land', 'commercial_land', 'farmland'].includes(t);
 
 const roomConfigs = ['1+0', '1+1', '2+1', '2+2', '3+1', '3+2', '4+1', '4+2', '5+1', '5+2', '6+'];
 const currencies = [
     { value: 'GBP', symbol: '£', label: 'STG (£)' },
-    { value: 'EUR', symbol: '€', label: 'Euro (€)' },
     { value: 'TRY', symbol: '₺', label: 'TL (₺)' },
-    { value: 'USD', symbol: '$', label: 'USD ($)' },
 ];
 
 const featureGroups = {
@@ -101,6 +120,8 @@ function AddPropertyContent() {
         building_age: '',
         owner_type: 'owner' as 'owner' | 'agent',
         whatsapp: '',
+        phone: '',
+        telegram: '',
         video_url: '',
         property_condition: 'secondhand' as string,
     };
@@ -149,6 +170,8 @@ function AddPropertyContent() {
                 building_age: String(data.building_age || ''),
                 owner_type: data.owner_type || 'owner',
                 whatsapp: data.whatsapp || '',
+                phone: data.phone || '',
+                telegram: data.telegram || '',
                 video_url: data.video_url || '',
                 property_condition: data.property_condition || 'secondhand',
             });
@@ -185,6 +208,12 @@ function AddPropertyContent() {
         if (!user) { setShowAuth(true); return; }
         setLoading(true);
         setError('');
+
+        if (!form.phone && !form.whatsapp && !form.telegram) {
+            setError(isTR ? 'En az bir iletişim bilgisi gerekli (Telefon, WhatsApp veya Telegram)' : 'At least one contact method required (Phone, WhatsApp or Telegram)');
+            setLoading(false);
+            return;
+        }
 
         // Upload photos
         const photoUrls: string[] = [];
@@ -232,6 +261,8 @@ function AddPropertyContent() {
             building_age: form.building_age || null,
             owner_type: form.owner_type,
             whatsapp: form.whatsapp || null,
+            phone: form.phone || null,
+            telegram: form.telegram || null,
             video_url: form.video_url || null,
             property_condition: form.property_condition,
         };
@@ -351,17 +382,24 @@ function AddPropertyContent() {
                                 </div>
                             </div>
 
-                            {/* Property Type */}
+                            {/* Property Type - Grouped */}
                             <div>
                                 <label style={labelStyle}>{isTR ? 'Mülk Tipi' : 'Property Type'} *</label>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                                    {propertyTypes.map(pt => (
-                                        <button key={pt.value} type="button" onClick={() => updateForm('property_type', pt.value)}
-                                            style={tagStyle(form.property_type === pt.value)}>
-                                            {isTR ? pt.tr : pt.en}
-                                        </button>
-                                    ))}
-                                </div>
+                                {propertyTypeGroups.map(group => (
+                                    <div key={isTR ? group.label.tr : group.label.en} style={{ marginBottom: '10px' }}>
+                                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>
+                                            {isTR ? group.label.tr : group.label.en}
+                                        </span>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                            {group.types.map(pt => (
+                                                <button key={pt.value} type="button" onClick={() => updateForm('property_type', pt.value)}
+                                                    style={tagStyle(form.property_type === pt.value)}>
+                                                    {isTR ? pt.tr : pt.en}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
 
                             {/* Title */}
@@ -513,6 +551,22 @@ function AddPropertyContent() {
                                 <label style={sectionTitleStyle}>📷 {isTR ? 'Fotoğraflar (max 20)' : 'Photos (max 20)'}</label>
                                 <div
                                     onClick={() => fileInputRef.current?.click()}
+                                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                    onDrop={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        const MAX_SIZE = 10 * 1024 * 1024;
+                                        const allFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+                                        const validFiles = allFiles.filter(f => f.size <= MAX_SIZE);
+                                        if (validFiles.length < allFiles.length) {
+                                            alert(isTR ? `${allFiles.length - validFiles.length} dosya 10MB limitini aşıyor.` : `${allFiles.length - validFiles.length} file(s) exceed 10MB limit.`);
+                                        }
+                                        const files = validFiles.slice(0, 20 - photos.length);
+                                        if (files.length === 0) return;
+                                        setPhotos(prev => [...prev, ...files].slice(0, 20));
+                                        const newPreviews = files.map(f => URL.createObjectURL(f));
+                                        setPhotoPreviews(prev => [...prev, ...newPreviews].slice(0, 20));
+                                    }}
                                     style={{
                                         border: '2px dashed var(--border)', borderRadius: 'var(--radius-md)',
                                         padding: '24px', textAlign: 'center', cursor: 'pointer',
@@ -632,10 +686,9 @@ function AddPropertyContent() {
                                 </div>
                             )}
 
-                            {/* Contact / Owner Info */}
                             <div style={sectionStyle}>
-                                <label style={sectionTitleStyle}>📞 {isTR ? 'İletişim Bilgileri' : 'Contact Info'}</label>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                <label style={sectionTitleStyle}>📞 {isTR ? 'İletişim Bilgileri' : 'Contact Info'} <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 400 }}>({isTR ? 'en az 1 zorunlu' : 'min 1 required'})</span></label>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
                                     <div>
                                         <label style={labelStyle}>{isTR ? 'İlan Sahibi' : 'Listed By'}</label>
                                         <div style={{ display: 'flex', gap: '6px' }}>
@@ -650,8 +703,18 @@ function AddPropertyContent() {
                                         </div>
                                     </div>
                                     <div>
-                                        <label style={labelStyle}>📱 WhatsApp ({isTR ? 'opsiyonel' : 'optional'})</label>
+                                        <label style={labelStyle}>📱 {isTR ? 'Telefon' : 'Phone'}</label>
+                                        <input type="tel" value={form.phone} onChange={e => updateForm('phone', e.target.value)} placeholder="+90 533 XXX XX XX" style={inputStyle} />
+                                    </div>
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                    <div>
+                                        <label style={labelStyle}>🟢 WhatsApp</label>
                                         <input type="tel" value={form.whatsapp} onChange={e => updateForm('whatsapp', e.target.value)} placeholder="+90 533 XXX XX XX" style={inputStyle} />
+                                    </div>
+                                    <div>
+                                        <label style={labelStyle}>✈️ Telegram</label>
+                                        <input type="text" value={form.telegram} onChange={e => updateForm('telegram', e.target.value)} placeholder="@kullaniciadi" style={inputStyle} />
                                     </div>
                                 </div>
                             </div>
