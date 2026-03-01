@@ -135,14 +135,19 @@ export default function PropertiesPage() {
 
             <main style={{ paddingTop: '100px', paddingBottom: '64px', minHeight: '100vh' }}>
                 <div className="container">
-                    <div style={{ marginBottom: '32px' }}>
-                        <h1 style={{ fontSize: '1.8rem', color: 'var(--text-primary)', marginBottom: '8px' }}>
-                            {locale === 'tr' ? '🏠 Kuzey Kıbrıs Emlak İlanları' : '🏠 North Cyprus Property Listings'}
-                        </h1>
-                        <p style={{ color: 'var(--text-muted)' }}>
-                            {loading ? (locale === 'tr' ? 'Yükleniyor...' : 'Loading...') :
-                                `${properties.length} ${locale === 'tr' ? 'ilan bulundu' : 'properties found'}`}
-                        </p>
+                    <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+                        <div>
+                            <h1 style={{ fontSize: '1.8rem', color: 'var(--text-primary)', marginBottom: '8px' }}>
+                                {locale === 'tr' ? '🏠 Kuzey Kıbrıs Emlak İlanları' : '🏠 North Cyprus Property Listings'}
+                            </h1>
+                            <p style={{ color: 'var(--text-muted)' }}>
+                                {loading ? (locale === 'tr' ? 'Yükleniyor...' : 'Loading...') :
+                                    `${properties.length} ${locale === 'tr' ? 'ilan bulundu' : 'properties found'}`}
+                            </p>
+                        </div>
+                        <a href="/add-property" className="btn btn-primary">
+                            ➕ {locale === 'tr' ? 'İlan Ekle' : 'Add Listing'}
+                        </a>
                     </div>
 
                     {/* Filters */}
