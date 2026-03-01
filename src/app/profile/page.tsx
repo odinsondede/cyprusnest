@@ -32,7 +32,7 @@ export default function ProfilePage() {
         const { data } = await supabase
             .from('properties')
             .select('*')
-            .eq('agent_id', userId)
+            .eq('user_id', userId)
             .order('created_at', { ascending: false });
         const listings = (data as Property[]) || [];
         setMyListings(listings);

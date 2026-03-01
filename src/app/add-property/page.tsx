@@ -130,7 +130,7 @@ function AddPropertyContent() {
             description_tr: form.description_tr,
             description_en: form.description_en || form.description_tr,
             type: form.type,
-            status: 'pending',
+            status: 'active',
             price: Number(form.price),
             currency: 'GBP',
             city: form.city,
@@ -158,7 +158,7 @@ function AddPropertyContent() {
             const { error } = await supabase.from('properties').update(propertyData).eq('id', editId);
             insertError = error;
         } else {
-            const { error } = await supabase.from('properties').insert({ ...propertyData, cyprusnest_score: null, views_count: 0 });
+            const { error } = await supabase.from('properties').insert({ ...propertyData, user_id: user.id, cyprusnest_score: null, views_count: 0 });
             insertError = error;
         }
 
