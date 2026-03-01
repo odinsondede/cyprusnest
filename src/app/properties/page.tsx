@@ -120,6 +120,24 @@ export default function PropertiesPage() {
     const [showAuth, setShowAuth] = useState(false);
     const [user, setUser] = useState<{ id: string } | null>(null);
     const [favIds, setFavIds] = useState<string[]>([]);
+    const [quickFilters, setQuickFilters] = useState({
+        available_now: false, bills_included: false, furnished: false,
+        parking: false, pool: false, sea_view: false,
+    });
+
+    function toggleQuick(key: keyof typeof quickFilters) {
+        setQuickFilters(prev => ({ ...prev, [key]: !prev[key] }));
+    }
+
+    const filteredProperties = properties.filter(p => {
+        if (quickFilters.available_now && !p.available_now) return false;
+        if (quickFilters.bills_included && !p.bills_included) return false;
+        if (quickFilters.furnished && !p.furnished) return false;
+        if (quickFilters.parking && !p.parking) return false;
+        if (quickFilters.pool && !p.pool) return false;
+        if (quickFilters.sea_view && !p.sea_view) return false;
+        return true;
+    });
 
     useEffect(() => {
         getCurrentUser().then(u => setUser(u as { id: string } | null));
@@ -241,20 +259,43 @@ export default function PropertiesPage() {
                         </select>
                     </div>
 
+                    {/* Quick filter chips */}
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '20px' }}>
+                        {[
+                            { key: 'available_now' as const, icon: '🟢', tr: 'Hemen Müsait', en: 'Available Now' },
+                            { key: 'bills_included' as const, icon: '💡', tr: 'Faturalar Dahil', en: 'Bills Incl.' },
+                            { key: 'furnished' as const, icon: '🛋️', tr: 'Eşyalı', en: 'Furnished' },
+                            { key: 'parking' as const, icon: '🅿️', tr: 'Otopark', en: 'Parking' },
+                            { key: 'pool' as const, icon: '🏊', tr: 'Havuz', en: 'Pool' },
+                            { key: 'sea_view' as const, icon: '🌊', tr: 'Deniz Manzarası', en: 'Sea View' },
+                        ].map(f => (
+                            <button key={f.key} onClick={() => toggleQuick(f.key)}
+                                style={{
+                                    padding: '5px 12px', borderRadius: '9999px', fontSize: '0.8rem', fontWeight: 500,
+                                    border: quickFilters[f.key] ? '1px solid var(--primary)' : '1px solid var(--border)',
+                                    background: quickFilters[f.key] ? 'rgba(14,165,233,0.15)' : 'transparent',
+                                    color: quickFilters[f.key] ? 'var(--primary-light)' : 'var(--text-muted)',
+                                    cursor: 'pointer', transition: 'all 0.15s ease',
+                                }}>
+                                {f.icon} {locale === 'tr' ? f.tr : f.en}
+                            </button>
+                        ))}
+                    </div>
+
                     {/* Property Grid */}
                     {loading ? (
                         <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
                             <div style={{ fontSize: '2rem', marginBottom: '12px' }}>⏳</div>
                             <p>{locale === 'tr' ? 'İlanlar yükleniyor...' : 'Loading properties...'}</p>
                         </div>
-                    ) : properties.length === 0 ? (
+                    ) : filteredProperties.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
                             <div style={{ fontSize: '2rem', marginBottom: '12px' }}>🔍</div>
                             <p>{locale === 'tr' ? 'İlan bulunamadı' : 'No properties found'}</p>
                         </div>
                     ) : (
                         <div className="properties-grid">
-                            {properties.map((p) => (
+                            {filteredProperties.map((p) => (
                                 <PropertyCard
                                     key={p.id}
                                     property={p}
