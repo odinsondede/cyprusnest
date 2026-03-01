@@ -88,6 +88,7 @@ function AddPropertyContent() {
     const [photos, setPhotos] = useState<File[]>([]);
     const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
     const [uploadProgress, setUploadProgress] = useState('');
+    const [step, setStep] = useState(1);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const defaultForm = {
@@ -320,9 +321,35 @@ function AddPropertyContent() {
                     <h1 style={{ color: 'var(--text-primary)', marginBottom: '8px', fontSize: '1.6rem' }}>
                         {editId ? (isTR ? '✏️ İlanı Düzenle' : '✏️ Edit Listing') : (isTR ? '➕ Yeni İlan Ekle' : '➕ Add New Listing')}
                     </h1>
-                    <p style={{ color: 'var(--text-muted)', marginBottom: '32px' }}>
+                    <p style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>
                         {isTR ? 'İlanınız hemen yayınlanacaktır.' : 'Your listing will be published immediately.'}
                     </p>
+
+                    {/* Progress Bar */}
+                    {!success && user && (
+                        <div style={{ display: 'flex', gap: '4px', marginBottom: '28px' }}>
+                            {[
+                                { n: 1, icon: '📋', tr: 'Temel', en: 'Basics' },
+                                { n: 2, icon: '🏠', tr: 'Detay', en: 'Details' },
+                                { n: 3, icon: '✨', tr: 'Özellikler', en: 'Features' },
+                                { n: 4, icon: '📸', tr: 'Medya', en: 'Media' },
+                            ].map(s => (
+                                <button key={s.n} type="button" onClick={() => setStep(s.n)}
+                                    style={{
+                                        flex: 1, padding: '12px 8px', borderRadius: 'var(--radius-md)',
+                                        border: step === s.n ? '2px solid var(--primary)' : '1px solid var(--border)',
+                                        background: step === s.n ? 'rgba(14,165,233,0.1)' : s.n < step ? 'rgba(16,185,129,0.08)' : 'var(--bg-darker)',
+                                        color: step === s.n ? 'var(--primary-light)' : s.n < step ? '#10b981' : 'var(--text-muted)',
+                                        cursor: 'pointer', fontSize: '0.78rem', fontWeight: step === s.n ? 700 : 500,
+                                        transition: 'all 0.2s', textAlign: 'center',
+                                    }}
+                                >
+                                    <div style={{ fontSize: '1.1rem', marginBottom: '2px' }}>{s.n < step ? '✅' : s.icon}</div>
+                                    {isTR ? s.tr : s.en}
+                                </button>
+                            ))}
+                        </div>
+                    )}
 
                     {!user && (
                         <div style={{
@@ -364,364 +391,408 @@ function AddPropertyContent() {
                             borderRadius: 'var(--radius-lg)', padding: '28px',
                             display: 'flex', flexDirection: 'column', gap: '20px',
                         }}>
-                            {/* SECTION 1: Type + Property Type */}
-                            <div>
-                                <label style={labelStyle}>{isTR ? 'İlan Türü' : 'Listing Type'} *</label>
-                                <div style={{ display: 'flex', gap: '8px' }}>
-                                    <button type="button" className={`btn ${form.type === 'rent' ? 'btn-primary' : 'btn-outline'}`}
-                                        onClick={() => updateForm('type', 'rent')} style={{ flex: 1 }}>
-                                        🔑 {isTR ? 'Kiralık' : 'Rent'}
-                                    </button>
-                                    <button type="button" className={`btn ${form.type === 'sale' ? 'btn-primary' : 'btn-outline'}`}
-                                        onClick={() => updateForm('type', 'sale')} style={{ flex: 1 }}>
-                                        🏠 {isTR ? 'Satılık' : 'Sale'}
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Property Type - Grouped */}
-                            <div>
-                                <label style={labelStyle}>{isTR ? 'Mülk Tipi' : 'Property Type'} *</label>
-                                {propertyTypeGroups.map(group => (
-                                    <div key={isTR ? group.label.tr : group.label.en} style={{ marginBottom: '10px' }}>
-                                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>
-                                            {isTR ? group.label.tr : group.label.en}
-                                        </span>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                                            {group.types.map(pt => (
-                                                <button key={pt.value} type="button" onClick={() => updateForm('property_type', pt.value)}
-                                                    style={tagStyle(form.property_type === pt.value)}>
-                                                    {isTR ? pt.tr : pt.en}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Title */}
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                            {/* ===== STEP 1: Temel Bilgiler ===== */}
+                            {step === 1 && (<>
+                                {/* Type */}
                                 <div>
-                                    <label style={labelStyle}>Başlık (TR) *</label>
-                                    <input type="text" required value={form.title_tr} onChange={e => updateForm('title_tr', e.target.value)} placeholder="Gönyeli 2+1 Daire" style={inputStyle} />
-                                </div>
-                                <div>
-                                    <label style={labelStyle}>Title (EN)</label>
-                                    <input type="text" value={form.title_en} onChange={e => updateForm('title_en', e.target.value)} placeholder="Gönyeli 2+1 Apartment" style={inputStyle} />
-                                </div>
-                            </div>
-
-                            {/* Price + Currency + City + District */}
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr 1fr', gap: '12px' }}>
-                                <div>
-                                    <label style={labelStyle}>{isTR ? `Fiyat (${currencySymbol})` : `Price (${currencySymbol})`} *</label>
-                                    <input type="number" required min="1" value={form.price} onChange={e => updateForm('price', e.target.value)} placeholder={form.type === 'rent' ? '500' : '150000'} style={inputStyle} />
-                                </div>
-                                <div style={{ minWidth: '100px' }}>
-                                    <label style={labelStyle}>{isTR ? 'Birim' : 'Curr.'}</label>
-                                    <select value={form.currency} onChange={e => updateForm('currency', e.target.value)} style={inputStyle}>
-                                        {currencies.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label style={labelStyle}>{isTR ? 'Şehir' : 'City'} *</label>
-                                    <select value={form.city} onChange={e => updateForm('city', e.target.value)} style={inputStyle}>
-                                        {cities.map(c => <option key={c} value={c}>{c}</option>)}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label style={labelStyle}>{isTR ? 'Bölge' : 'District'}</label>
-                                    <input type="text" value={form.district} onChange={e => updateForm('district', e.target.value)} placeholder="Gönyeli" style={inputStyle} />
-                                </div>
-                            </div>
-
-                            {/* Room Config + Specs */}
-                            {form.property_type !== 'land' && (
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '12px' }}>
-                                    <div>
-                                        <label style={labelStyle}>{isTR ? 'Oda' : 'Rooms'} *</label>
-                                        <select value={form.room_config} onChange={e => {
-                                            updateForm('room_config', e.target.value);
-                                            const bed = e.target.value.split('+')[0];
-                                            updateForm('bedrooms', bed === '6' ? '6' : bed);
-                                        }} style={inputStyle}>
-                                            {roomConfigs.map(r => <option key={r} value={r}>{r}</option>)}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label style={labelStyle}>🚿 {isTR ? 'Banyo' : 'Baths'}</label>
-                                        <select value={form.bathrooms} onChange={e => updateForm('bathrooms', e.target.value)} style={inputStyle}>
-                                            {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label style={labelStyle}>📐 m²</label>
-                                        <input type="number" min="10" value={form.area_sqm} onChange={e => updateForm('area_sqm', e.target.value)} placeholder="85" style={inputStyle} />
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: '4px' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: 'var(--text-primary)' }}>
-                                            <input type="checkbox" checked={form.furnished} onChange={e => updateForm('furnished', e.target.checked)} />
-                                            {isTR ? 'Eşyalı' : 'Furnished'}
-                                        </label>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Floor + Building Age (optional) */}
-                            {form.property_type !== 'land' && (
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '12px' }}>
-                                    <div>
-                                        <label style={labelStyle}>{isTR ? 'Bulunduğu Kat' : 'Floor'}</label>
-                                        <input type="number" min="0" value={form.floor} onChange={e => updateForm('floor', e.target.value)} placeholder="3" style={inputStyle} />
-                                    </div>
-                                    <div>
-                                        <label style={labelStyle}>{isTR ? 'Toplam Kat' : 'Total Floors'}</label>
-                                        <input type="number" min="1" value={form.total_floors} onChange={e => updateForm('total_floors', e.target.value)} placeholder="5" style={inputStyle} />
-                                    </div>
-                                    <div>
-                                        <label style={labelStyle}>{isTR ? 'Bina Yaşı' : 'Building Age'}</label>
-                                        <select value={form.building_age} onChange={e => updateForm('building_age', e.target.value)} style={inputStyle}>
-                                            <option value="">{isTR ? 'Seçin' : 'Select'}</option>
-                                            <option value="0-1">0-1</option>
-                                            <option value="1-5">1-5</option>
-                                            <option value="5-10">5-10</option>
-                                            <option value="10-20">10-20</option>
-                                            <option value="20+">20+</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label style={labelStyle}>{isTR ? 'Durumu' : 'Condition'}</label>
-                                        <select value={form.property_condition} onChange={e => updateForm('property_condition', e.target.value)} style={inputStyle}>
-                                            <option value="new">{isTR ? 'Sıfır' : 'New'}</option>
-                                            <option value="secondhand">{isTR ? 'İkinci El' : 'Second Hand'}</option>
-                                            <option value="offplan">{isTR ? 'Projeden' : 'Off-plan'}</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Description */}
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                                <div>
-                                    <label style={labelStyle}>{isTR ? 'Açıklama (TR)' : 'Description (TR)'}</label>
-                                    <textarea rows={3} value={form.description_tr} onChange={e => updateForm('description_tr', e.target.value)}
-                                        placeholder={isTR ? 'Mülk hakkında detaylar...' : 'Property details in Turkish...'} style={{ ...inputStyle, resize: 'vertical' as const }} />
-                                </div>
-                                <div>
-                                    <label style={labelStyle}>{isTR ? 'Açıklama (EN)' : 'Description (EN)'}</label>
-                                    <textarea rows={3} value={form.description_en} onChange={e => updateForm('description_en', e.target.value)}
-                                        placeholder="Property details in English..." style={{ ...inputStyle, resize: 'vertical' as const }} />
-                                </div>
-                            </div>
-
-                            {/* Features - Selectable Tags */}
-                            <div style={sectionStyle}>
-                                <label style={sectionTitleStyle}>✨ {isTR ? 'Özellikler' : 'Features'}</label>
-                                {(isTR ? featureGroups.tr : featureGroups.en).map(group => (
-                                    <div key={group.label} style={{ marginBottom: '14px' }}>
-                                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>{group.label}</span>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                                            {group.items.map(item => (
-                                                <button key={item} type="button" onClick={() => toggleFeature(item)} style={tagStyle(form.features.includes(item))}>
-                                                    {form.features.includes(item) ? '✓ ' : ''}{item}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Nearby - Selectable Tags */}
-                            <div>
-                                <label style={sectionTitleStyle}>📍 {isTR ? 'Yakın Noktalar' : 'Nearby Landmarks'}</label>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                                    {nearbyOptions.map(item => (
-                                        <button key={item} type="button" onClick={() => toggleLandmark(item)} style={tagStyle(form.nearby_landmarks.includes(item))}>
-                                            {form.nearby_landmarks.includes(item) ? '✓ ' : ''}{item}
+                                    <label style={labelStyle}>{isTR ? 'İlan Türü' : 'Listing Type'} *</label>
+                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                        <button type="button" className={`btn ${form.type === 'rent' ? 'btn-primary' : 'btn-outline'}`}
+                                            onClick={() => updateForm('type', 'rent')} style={{ flex: 1 }}>
+                                            🔑 {isTR ? 'Kiralık' : 'Rent'}
                                         </button>
+                                        <button type="button" className={`btn ${form.type === 'sale' ? 'btn-primary' : 'btn-outline'}`}
+                                            onClick={() => updateForm('type', 'sale')} style={{ flex: 1 }}>
+                                            🏠 {isTR ? 'Satılık' : 'Sale'}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Property Type - Grouped */}
+                                <div>
+                                    <label style={labelStyle}>{isTR ? 'Mülk Tipi' : 'Property Type'} *</label>
+                                    {propertyTypeGroups.map(group => (
+                                        <div key={isTR ? group.label.tr : group.label.en} style={{ marginBottom: '10px' }}>
+                                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>
+                                                {isTR ? group.label.tr : group.label.en}
+                                            </span>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                                {group.types.map(pt => (
+                                                    <button key={pt.value} type="button" onClick={() => updateForm('property_type', pt.value)}
+                                                        style={tagStyle(form.property_type === pt.value)}>
+                                                        {isTR ? pt.tr : pt.en}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
                                     ))}
                                 </div>
-                            </div>
 
-                            {/* Photo Upload */}
-                            <div style={sectionStyle}>
-                                <label style={sectionTitleStyle}>📷 {isTR ? 'Fotoğraflar (max 20)' : 'Photos (max 20)'}</label>
-                                <div
-                                    onClick={() => fileInputRef.current?.click()}
-                                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                                    onDrop={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        const allFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/') || f.type.startsWith('video/'));
-                                        const MAX_IMG = 10 * 1024 * 1024;
-                                        const MAX_VID = 50 * 1024 * 1024;
-                                        const validFiles = allFiles.filter(f => f.type.startsWith('video/') ? f.size <= MAX_VID : f.size <= MAX_IMG);
-                                        if (validFiles.length < allFiles.length) {
-                                            alert(isTR ? `${allFiles.length - validFiles.length} dosya 10MB limitini aşıyor.` : `${allFiles.length - validFiles.length} file(s) exceed 10MB limit.`);
-                                        }
-                                        const files = validFiles.slice(0, 20 - photos.length);
-                                        if (files.length === 0) return;
-                                        setPhotos(prev => [...prev, ...files].slice(0, 20));
-                                        const newPreviews = files.map(f => URL.createObjectURL(f));
-                                        setPhotoPreviews(prev => [...prev, ...newPreviews].slice(0, 20));
-                                    }}
-                                    style={{
-                                        border: '2px dashed var(--border)', borderRadius: 'var(--radius-md)',
-                                        padding: '24px', textAlign: 'center', cursor: 'pointer',
-                                        background: 'rgba(14,165,233,0.03)', transition: 'all 0.2s',
-                                    }}
-                                >
-                                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📷🎬</div>
-                                    <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                                        {isTR ? 'Fotoğraf ve Video sürükleyin veya tıklayın' : 'Drag & drop photos and videos or click'}
-                                    </p>
-                                    <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '4px' }}>
-                                        {isTR ? 'Fotoğraf: JPG/PNG/WebP (max 10MB) — Video: MP4/MOV/WebM (max 50MB)' : 'Photos: JPG/PNG/WebP (max 10MB) — Videos: MP4/MOV/WebM (max 50MB)'}
-                                    </p>
-                                </div>
-                                <input
-                                    ref={fileInputRef}
-                                    type="file"
-                                    accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm"
-                                    multiple
-                                    style={{ display: 'none' }}
-                                    onChange={(e) => {
-                                        const MAX_IMG = 10 * 1024 * 1024;
-                                        const MAX_VID = 50 * 1024 * 1024;
-                                        const allFiles = Array.from(e.target.files || []);
-                                        const validFiles = allFiles.filter(f => f.type.startsWith('video/') ? f.size <= MAX_VID : f.size <= MAX_IMG);
-                                        if (validFiles.length < allFiles.length) {
-                                            alert(isTR ? `${allFiles.length - validFiles.length} dosya limiti aşıyor.` : `${allFiles.length - validFiles.length} file(s) exceed size limit.`);
-                                        }
-                                        const files = validFiles.slice(0, 20 - photos.length);
-                                        if (files.length === 0) return;
-                                        setPhotos(prev => [...prev, ...files].slice(0, 20));
-                                        const newPreviews = files.map(f => URL.createObjectURL(f));
-                                        setPhotoPreviews(prev => [...prev, ...newPreviews].slice(0, 20));
-                                        e.target.value = '';
-                                    }}
-                                />
-                                {photoPreviews.length > 0 && (
-                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
-                                        {photoPreviews.map((src, i) => (
-                                            <div key={i} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
-                                                <img src={src} alt={`Photo ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                <button type="button" onClick={() => {
-                                                    setPhotos(prev => prev.filter((_, idx) => idx !== i));
-                                                    setPhotoPreviews(prev => prev.filter((_, idx) => idx !== i));
-                                                }} style={{
-                                                    position: 'absolute', top: '2px', right: '2px', width: '20px', height: '20px',
-                                                    background: 'rgba(239,68,68,0.9)', color: 'white', border: 'none', borderRadius: '50%',
-                                                    fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                }}>✕</button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
-
-                            {/* KKTC-Specific: Rental Fields */}
-                            {form.type === 'rent' && (
-                                <>
-                                    <div style={sectionStyle}>
-                                        <label style={sectionTitleStyle}>
-                                            🔑 {isTR ? 'Kiralık Detayları' : 'Rental Details'}
-                                        </label>
-                                    </div>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
-                                        <div>
-                                            <label style={labelStyle}>{isTR ? 'Depozito (kira sayısı)' : 'Deposit (months)'}</label>
-                                            <select value={form.deposit_amount} onChange={e => updateForm('deposit_amount', e.target.value)} style={inputStyle}>
-                                                <option value="0">{isTR ? 'Yok' : 'None'}</option>
-                                                <option value="1">1 {isTR ? 'kira' : 'month'}</option>
-                                                <option value="2">2 {isTR ? 'kira' : 'months'}</option>
-                                                <option value="3">3 {isTR ? 'kira' : 'months'}</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label style={labelStyle}>{isTR ? 'Sözleşme Süresi' : 'Contract Type'}</label>
-                                            <select value={form.contract_type} onChange={e => updateForm('contract_type', e.target.value)} style={inputStyle}>
-                                                <option value="monthly">{isTR ? 'Aylık' : 'Monthly'}</option>
-                                                <option value="sixmonth">{isTR ? '6 Ay' : '6 Months'}</option>
-                                                <option value="yearly">{isTR ? 'Yıllık' : 'Yearly'}</option>
-                                                <option value="flexible">{isTR ? 'Esnek' : 'Flexible'}</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label style={labelStyle}>{isTR ? `Aylık Aidat (${currencySymbol})` : `Monthly Fees (${currencySymbol})`}</label>
-                                            <input type="number" min="0" value={form.monthly_fees} onChange={e => updateForm('monthly_fees', e.target.value)} placeholder="50" style={inputStyle} />
-                                        </div>
-                                    </div>
-                                    <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: 'var(--text-primary)' }}>
-                                            <input type="checkbox" checked={form.bills_included} onChange={e => updateForm('bills_included', e.target.checked)} />
-                                            💡 {isTR ? 'Faturalar Dahil' : 'Bills Included'}
-                                        </label>
-                                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: 'var(--text-primary)' }}>
-                                            <input type="checkbox" checked={form.available_now} onChange={e => updateForm('available_now', e.target.checked)} />
-                                            🟢 {isTR ? 'Hemen Müsait' : 'Available Now'}
-                                        </label>
-                                    </div>
-                                </>
-                            )}
-
-                            {/* Title Deed - for sale */}
-                            {form.type === 'sale' && (
-                                <div>
-                                    <label style={labelStyle}>{isTR ? 'Tapu Türü' : 'Title Deed Type'} *</label>
-                                    <select value={form.title_deed_type} onChange={e => updateForm('title_deed_type', e.target.value)} style={inputStyle}>
-                                        <option value="turkish">{isTR ? 'Türk Koçanı' : 'Turkish Title'}</option>
-                                        <option value="equivalent">{isTR ? 'Eşdeğer Koçan' : 'Equivalent Title'}</option>
-                                        <option value="allocation">{isTR ? 'Tahsis' : 'Allocation'}</option>
-                                        <option value="foreign">{isTR ? 'Yabancı Koçan' : 'Foreign Title'}</option>
-                                        <option value="unknown">{isTR ? 'Bilinmiyor' : 'Unknown'}</option>
-                                    </select>
-                                </div>
-                            )}
-
-                            <div style={sectionStyle}>
-                                <label style={sectionTitleStyle}>📞 {isTR ? 'İletişim Bilgileri' : 'Contact Info'} <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 400 }}>({isTR ? 'en az 1 zorunlu' : 'min 1 required'})</span></label>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-                                    <div>
-                                        <label style={labelStyle}>{isTR ? 'İlan Sahibi' : 'Listed By'}</label>
-                                        <div style={{ display: 'flex', gap: '6px' }}>
-                                            <button type="button" onClick={() => updateForm('owner_type', 'owner')}
-                                                style={{ ...tagStyle(form.owner_type === 'owner'), flex: 1, textAlign: 'center' as const }}>
-                                                👤 {isTR ? 'Sahibinden' : 'Owner'}
-                                            </button>
-                                            <button type="button" onClick={() => updateForm('owner_type', 'agent')}
-                                                style={{ ...tagStyle(form.owner_type === 'agent'), flex: 1, textAlign: 'center' as const }}>
-                                                🏢 {isTR ? 'Emlakçı' : 'Agent'}
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label style={labelStyle}>📱 {isTR ? 'Telefon' : 'Phone'}</label>
-                                        <input type="tel" value={form.phone} onChange={e => updateForm('phone', e.target.value)} placeholder="+90 533 XXX XX XX" style={inputStyle} />
-                                    </div>
-                                </div>
+                                {/* Title */}
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                                     <div>
-                                        <label style={labelStyle}>🟢 WhatsApp</label>
-                                        <input type="tel" value={form.whatsapp} onChange={e => updateForm('whatsapp', e.target.value)} placeholder="+90 533 XXX XX XX" style={inputStyle} />
+                                        <label style={labelStyle}>Başlık (TR) *</label>
+                                        <input type="text" required value={form.title_tr} onChange={e => updateForm('title_tr', e.target.value)} placeholder="Gönyeli 2+1 Daire" style={inputStyle} />
                                     </div>
                                     <div>
-                                        <label style={labelStyle}>✈️ Telegram</label>
-                                        <input type="text" value={form.telegram} onChange={e => updateForm('telegram', e.target.value)} placeholder="@kullaniciadi" style={inputStyle} />
+                                        <label style={labelStyle}>Title (EN)</label>
+                                        <input type="text" value={form.title_en} onChange={e => updateForm('title_en', e.target.value)} placeholder="Gönyeli 2+1 Apartment" style={inputStyle} />
                                     </div>
                                 </div>
-                            </div>
 
-                            {error && (
-                                <div style={{ padding: '10px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 'var(--radius-md)', color: '#ef4444', fontSize: '0.85rem' }}>
-                                    ❌ {error}
+                                {/* Price + Currency + City + District */}
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr 1fr', gap: '12px' }}>
+                                    <div>
+                                        <label style={labelStyle}>{isTR ? `Fiyat (${currencySymbol})` : `Price (${currencySymbol})`} *</label>
+                                        <input type="number" required min="1" value={form.price} onChange={e => updateForm('price', e.target.value)} placeholder={form.type === 'rent' ? '500' : '150000'} style={inputStyle} />
+                                    </div>
+                                    <div style={{ minWidth: '100px' }}>
+                                        <label style={labelStyle}>{isTR ? 'Birim' : 'Curr.'}</label>
+                                        <select value={form.currency} onChange={e => updateForm('currency', e.target.value)} style={inputStyle}>
+                                            {currencies.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style={labelStyle}>{isTR ? 'Şehir' : 'City'} *</label>
+                                        <select value={form.city} onChange={e => updateForm('city', e.target.value)} style={inputStyle}>
+                                            {cities.map(c => <option key={c} value={c}>{c}</option>)}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style={labelStyle}>{isTR ? 'Bölge' : 'District'}</label>
+                                        <input type="text" value={form.district} onChange={e => updateForm('district', e.target.value)} placeholder="Gönyeli" style={inputStyle} />
+                                    </div>
                                 </div>
-                            )}
 
-                            <button type="submit" disabled={loading || !user} className="btn btn-primary btn-lg" style={{ opacity: (loading || !user) ? 0.5 : 1 }}>
-                                {loading ? (uploadProgress || '⏳...') : editId ? (isTR ? '✅ İlanı Güncelle' : '✅ Update Listing') : (isTR ? '📤 İlanı Yayınla' : '📤 Publish Listing')}
-                            </button>
+                                {/* Step 1 Navigation */}
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+                                    <button type="button" className="btn btn-primary" onClick={() => setStep(2)} style={{ minWidth: '140px' }}>
+                                        {isTR ? 'İleri →' : 'Next →'}
+                                    </button>
+                                </div>
+                            </>)}
+
+                            {/* ===== STEP 2: Detaylar ===== */}
+                            {step === 2 && (<>
+                                {/* Room Config + Specs */}
+                                {form.property_type !== 'land' && (
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '12px' }}>
+                                        <div>
+                                            <label style={labelStyle}>{isTR ? 'Oda' : 'Rooms'} *</label>
+                                            <select value={form.room_config} onChange={e => {
+                                                updateForm('room_config', e.target.value);
+                                                const bed = e.target.value.split('+')[0];
+                                                updateForm('bedrooms', bed === '6' ? '6' : bed);
+                                            }} style={inputStyle}>
+                                                {roomConfigs.map(r => <option key={r} value={r}>{r}</option>)}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label style={labelStyle}>🚿 {isTR ? 'Banyo' : 'Baths'}</label>
+                                            <select value={form.bathrooms} onChange={e => updateForm('bathrooms', e.target.value)} style={inputStyle}>
+                                                {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label style={labelStyle}>📐 m²</label>
+                                            <input type="number" min="10" value={form.area_sqm} onChange={e => updateForm('area_sqm', e.target.value)} placeholder="85" style={inputStyle} />
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: '4px' }}>
+                                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: 'var(--text-primary)' }}>
+                                                <input type="checkbox" checked={form.furnished} onChange={e => updateForm('furnished', e.target.checked)} />
+                                                {isTR ? 'Eşyalı' : 'Furnished'}
+                                            </label>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Floor + Building Age (optional) */}
+                                {form.property_type !== 'land' && (
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '12px' }}>
+                                        <div>
+                                            <label style={labelStyle}>{isTR ? 'Bulunduğu Kat' : 'Floor'}</label>
+                                            <input type="number" min="0" value={form.floor} onChange={e => updateForm('floor', e.target.value)} placeholder="3" style={inputStyle} />
+                                        </div>
+                                        <div>
+                                            <label style={labelStyle}>{isTR ? 'Toplam Kat' : 'Total Floors'}</label>
+                                            <input type="number" min="1" value={form.total_floors} onChange={e => updateForm('total_floors', e.target.value)} placeholder="5" style={inputStyle} />
+                                        </div>
+                                        <div>
+                                            <label style={labelStyle}>{isTR ? 'Bina Yaşı' : 'Building Age'}</label>
+                                            <select value={form.building_age} onChange={e => updateForm('building_age', e.target.value)} style={inputStyle}>
+                                                <option value="">{isTR ? 'Seçin' : 'Select'}</option>
+                                                <option value="0-1">0-1</option>
+                                                <option value="1-5">1-5</option>
+                                                <option value="5-10">5-10</option>
+                                                <option value="10-20">10-20</option>
+                                                <option value="20+">20+</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label style={labelStyle}>{isTR ? 'Durumu' : 'Condition'}</label>
+                                            <select value={form.property_condition} onChange={e => updateForm('property_condition', e.target.value)} style={inputStyle}>
+                                                <option value="new">{isTR ? 'Sıfır' : 'New'}</option>
+                                                <option value="secondhand">{isTR ? 'İkinci El' : 'Second Hand'}</option>
+                                                <option value="offplan">{isTR ? 'Projeden' : 'Off-plan'}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Step 2 Navigation */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
+                                    <button type="button" className="btn btn-outline" onClick={() => setStep(1)} style={{ minWidth: '140px' }}>
+                                        {isTR ? '← Geri' : '← Back'}
+                                    </button>
+                                    <button type="button" className="btn btn-primary" onClick={() => setStep(3)} style={{ minWidth: '140px' }}>
+                                        {isTR ? 'İleri →' : 'Next →'}
+                                    </button>
+                                </div>
+                            </>)}
+
+                            {/* ===== STEP 3: Özellikler & Açıklama ===== */}
+                            {step === 3 && (<>
+                                {/* Description */}
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                    <div>
+                                        <label style={labelStyle}>{isTR ? 'Açıklama (TR)' : 'Description (TR)'}</label>
+                                        <textarea rows={3} value={form.description_tr} onChange={e => updateForm('description_tr', e.target.value)}
+                                            placeholder={isTR ? 'Mülk hakkında detaylar...' : 'Property details in Turkish...'} style={{ ...inputStyle, resize: 'vertical' as const }} />
+                                    </div>
+                                    <div>
+                                        <label style={labelStyle}>{isTR ? 'Açıklama (EN)' : 'Description (EN)'}</label>
+                                        <textarea rows={3} value={form.description_en} onChange={e => updateForm('description_en', e.target.value)}
+                                            placeholder="Property details in English..." style={{ ...inputStyle, resize: 'vertical' as const }} />
+                                    </div>
+                                </div>
+
+                                {/* Features - Selectable Tags */}
+                                <div style={sectionStyle}>
+                                    <label style={sectionTitleStyle}>✨ {isTR ? 'Özellikler' : 'Features'}</label>
+                                    {(isTR ? featureGroups.tr : featureGroups.en).map(group => (
+                                        <div key={group.label} style={{ marginBottom: '14px' }}>
+                                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>{group.label}</span>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                                {group.items.map(item => (
+                                                    <button key={item} type="button" onClick={() => toggleFeature(item)} style={tagStyle(form.features.includes(item))}>
+                                                        {form.features.includes(item) ? '✓ ' : ''}{item}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Nearby - Selectable Tags */}
+                                <div>
+                                    <label style={sectionTitleStyle}>📍 {isTR ? 'Yakın Noktalar' : 'Nearby Landmarks'}</label>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                        {nearbyOptions.map(item => (
+                                            <button key={item} type="button" onClick={() => toggleLandmark(item)} style={tagStyle(form.nearby_landmarks.includes(item))}>
+                                                {form.nearby_landmarks.includes(item) ? '✓ ' : ''}{item}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Step 3 Navigation */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
+                                    <button type="button" className="btn btn-outline" onClick={() => setStep(2)} style={{ minWidth: '140px' }}>
+                                        {isTR ? '← Geri' : '← Back'}
+                                    </button>
+                                    <button type="button" className="btn btn-primary" onClick={() => setStep(4)} style={{ minWidth: '140px' }}>
+                                        {isTR ? 'İleri →' : 'Next →'}
+                                    </button>
+                                </div>
+                            </>)}
+
+                            {/* ===== STEP 4: Medya & İletişim ===== */}
+                            {step === 4 && (<>
+                                {/* Photo Upload */}
+                                <div style={sectionStyle}>
+                                    <label style={sectionTitleStyle}>📷 {isTR ? 'Fotoğraflar (max 20)' : 'Photos (max 20)'}</label>
+                                    <div
+                                        onClick={() => fileInputRef.current?.click()}
+                                        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                        onDrop={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            const allFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/') || f.type.startsWith('video/'));
+                                            const MAX_IMG = 10 * 1024 * 1024;
+                                            const MAX_VID = 50 * 1024 * 1024;
+                                            const validFiles = allFiles.filter(f => f.type.startsWith('video/') ? f.size <= MAX_VID : f.size <= MAX_IMG);
+                                            if (validFiles.length < allFiles.length) {
+                                                alert(isTR ? `${allFiles.length - validFiles.length} dosya 10MB limitini aşıyor.` : `${allFiles.length - validFiles.length} file(s) exceed 10MB limit.`);
+                                            }
+                                            const files = validFiles.slice(0, 20 - photos.length);
+                                            if (files.length === 0) return;
+                                            setPhotos(prev => [...prev, ...files].slice(0, 20));
+                                            const newPreviews = files.map(f => URL.createObjectURL(f));
+                                            setPhotoPreviews(prev => [...prev, ...newPreviews].slice(0, 20));
+                                        }}
+                                        style={{
+                                            border: '2px dashed var(--border)', borderRadius: 'var(--radius-md)',
+                                            padding: '24px', textAlign: 'center', cursor: 'pointer',
+                                            background: 'rgba(14,165,233,0.03)', transition: 'all 0.2s',
+                                        }}
+                                    >
+                                        <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📷🎬</div>
+                                        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                                            {isTR ? 'Fotoğraf ve Video sürükleyin veya tıklayın' : 'Drag & drop photos and videos or click'}
+                                        </p>
+                                        <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '4px' }}>
+                                            {isTR ? 'Fotoğraf: JPG/PNG/WebP (max 10MB) — Video: MP4/MOV/WebM (max 50MB)' : 'Photos: JPG/PNG/WebP (max 10MB) — Videos: MP4/MOV/WebM (max 50MB)'}
+                                        </p>
+                                    </div>
+                                    <input
+                                        ref={fileInputRef}
+                                        type="file"
+                                        accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm"
+                                        multiple
+                                        style={{ display: 'none' }}
+                                        onChange={(e) => {
+                                            const MAX_IMG = 10 * 1024 * 1024;
+                                            const MAX_VID = 50 * 1024 * 1024;
+                                            const allFiles = Array.from(e.target.files || []);
+                                            const validFiles = allFiles.filter(f => f.type.startsWith('video/') ? f.size <= MAX_VID : f.size <= MAX_IMG);
+                                            if (validFiles.length < allFiles.length) {
+                                                alert(isTR ? `${allFiles.length - validFiles.length} dosya limiti aşıyor.` : `${allFiles.length - validFiles.length} file(s) exceed size limit.`);
+                                            }
+                                            const files = validFiles.slice(0, 20 - photos.length);
+                                            if (files.length === 0) return;
+                                            setPhotos(prev => [...prev, ...files].slice(0, 20));
+                                            const newPreviews = files.map(f => URL.createObjectURL(f));
+                                            setPhotoPreviews(prev => [...prev, ...newPreviews].slice(0, 20));
+                                            e.target.value = '';
+                                        }}
+                                    />
+                                    {photoPreviews.length > 0 && (
+                                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
+                                            {photoPreviews.map((src, i) => (
+                                                <div key={i} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+                                                    <img src={src} alt={`Photo ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                    <button type="button" onClick={() => {
+                                                        setPhotos(prev => prev.filter((_, idx) => idx !== i));
+                                                        setPhotoPreviews(prev => prev.filter((_, idx) => idx !== i));
+                                                    }} style={{
+                                                        position: 'absolute', top: '2px', right: '2px', width: '20px', height: '20px',
+                                                        background: 'rgba(239,68,68,0.9)', color: 'white', border: 'none', borderRadius: '50%',
+                                                        fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    }}>✕</button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+
+                                {/* KKTC-Specific: Rental Fields */}
+                                {form.type === 'rent' && (
+                                    <>
+                                        <div style={sectionStyle}>
+                                            <label style={sectionTitleStyle}>
+                                                🔑 {isTR ? 'Kiralık Detayları' : 'Rental Details'}
+                                            </label>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+                                            <div>
+                                                <label style={labelStyle}>{isTR ? 'Depozito (kira sayısı)' : 'Deposit (months)'}</label>
+                                                <select value={form.deposit_amount} onChange={e => updateForm('deposit_amount', e.target.value)} style={inputStyle}>
+                                                    <option value="0">{isTR ? 'Yok' : 'None'}</option>
+                                                    <option value="1">1 {isTR ? 'kira' : 'month'}</option>
+                                                    <option value="2">2 {isTR ? 'kira' : 'months'}</option>
+                                                    <option value="3">3 {isTR ? 'kira' : 'months'}</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label style={labelStyle}>{isTR ? 'Sözleşme Süresi' : 'Contract Type'}</label>
+                                                <select value={form.contract_type} onChange={e => updateForm('contract_type', e.target.value)} style={inputStyle}>
+                                                    <option value="monthly">{isTR ? 'Aylık' : 'Monthly'}</option>
+                                                    <option value="sixmonth">{isTR ? '6 Ay' : '6 Months'}</option>
+                                                    <option value="yearly">{isTR ? 'Yıllık' : 'Yearly'}</option>
+                                                    <option value="flexible">{isTR ? 'Esnek' : 'Flexible'}</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label style={labelStyle}>{isTR ? `Aylık Aidat (${currencySymbol})` : `Monthly Fees (${currencySymbol})`}</label>
+                                                <input type="number" min="0" value={form.monthly_fees} onChange={e => updateForm('monthly_fees', e.target.value)} placeholder="50" style={inputStyle} />
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: 'var(--text-primary)' }}>
+                                                <input type="checkbox" checked={form.bills_included} onChange={e => updateForm('bills_included', e.target.checked)} />
+                                                💡 {isTR ? 'Faturalar Dahil' : 'Bills Included'}
+                                            </label>
+                                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: 'var(--text-primary)' }}>
+                                                <input type="checkbox" checked={form.available_now} onChange={e => updateForm('available_now', e.target.checked)} />
+                                                🟢 {isTR ? 'Hemen Müsait' : 'Available Now'}
+                                            </label>
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* Title Deed - for sale */}
+                                {form.type === 'sale' && (
+                                    <div>
+                                        <label style={labelStyle}>{isTR ? 'Tapu Türü' : 'Title Deed Type'} *</label>
+                                        <select value={form.title_deed_type} onChange={e => updateForm('title_deed_type', e.target.value)} style={inputStyle}>
+                                            <option value="turkish">{isTR ? 'Türk Koçanı' : 'Turkish Title'}</option>
+                                            <option value="equivalent">{isTR ? 'Eşdeğer Koçan' : 'Equivalent Title'}</option>
+                                            <option value="allocation">{isTR ? 'Tahsis' : 'Allocation'}</option>
+                                            <option value="foreign">{isTR ? 'Yabancı Koçan' : 'Foreign Title'}</option>
+                                            <option value="unknown">{isTR ? 'Bilinmiyor' : 'Unknown'}</option>
+                                        </select>
+                                    </div>
+                                )}
+
+                                <div style={sectionStyle}>
+                                    <label style={sectionTitleStyle}>📞 {isTR ? 'İletişim Bilgileri' : 'Contact Info'} <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 400 }}>({isTR ? 'en az 1 zorunlu' : 'min 1 required'})</span></label>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                                        <div>
+                                            <label style={labelStyle}>{isTR ? 'İlan Sahibi' : 'Listed By'}</label>
+                                            <div style={{ display: 'flex', gap: '6px' }}>
+                                                <button type="button" onClick={() => updateForm('owner_type', 'owner')}
+                                                    style={{ ...tagStyle(form.owner_type === 'owner'), flex: 1, textAlign: 'center' as const }}>
+                                                    👤 {isTR ? 'Sahibinden' : 'Owner'}
+                                                </button>
+                                                <button type="button" onClick={() => updateForm('owner_type', 'agent')}
+                                                    style={{ ...tagStyle(form.owner_type === 'agent'), flex: 1, textAlign: 'center' as const }}>
+                                                    🏢 {isTR ? 'Emlakçı' : 'Agent'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label style={labelStyle}>📱 {isTR ? 'Telefon' : 'Phone'}</label>
+                                            <input type="tel" value={form.phone} onChange={e => updateForm('phone', e.target.value)} placeholder="+90 533 XXX XX XX" style={inputStyle} />
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                        <div>
+                                            <label style={labelStyle}>🟢 WhatsApp</label>
+                                            <input type="tel" value={form.whatsapp} onChange={e => updateForm('whatsapp', e.target.value)} placeholder="+90 533 XXX XX XX" style={inputStyle} />
+                                        </div>
+                                        <div>
+                                            <label style={labelStyle}>✈️ Telegram</label>
+                                            <input type="text" value={form.telegram} onChange={e => updateForm('telegram', e.target.value)} placeholder="@kullaniciadi" style={inputStyle} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {error && (
+                                    <div style={{ padding: '10px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 'var(--radius-md)', color: '#ef4444', fontSize: '0.85rem' }}>
+                                        ❌ {error}
+                                    </div>
+                                )}
+
+                                <button type="submit" disabled={loading || !user} className="btn btn-primary btn-lg" style={{ opacity: (loading || !user) ? 0.5 : 1 }}>
+                                    {loading ? (uploadProgress || '⏳...') : editId ? (isTR ? '✅ İlanı Güncelle' : '✅ Update Listing') : (isTR ? '📤 İlanı Yayınla' : '📤 Publish Listing')}
+                                </button>
+
+                                {/* Step 4 Back button */}
+                                <button type="button" className="btn btn-outline" onClick={() => setStep(3)} style={{ marginTop: '8px' }}>
+                                    {isTR ? '← Geri' : '← Back'}
+                                </button>
+                            </>)}
                         </form>
                     )}
                 </div>

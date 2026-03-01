@@ -16,6 +16,14 @@ import AuthModal from '@/components/AuthModal';
 function PropertyCard({ property, locale, isFav, onToggleFav, displayCurrency }: { property: Property; locale: Locale; isFav: boolean; onToggleFav: () => void; displayCurrency: Currency }) {
     const title = locale === 'tr' ? property.title_tr : property.title_en;
     const isRent = property.type === 'rent';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const p = property as any;
+    const roomConfig = p.room_config || `${property.bedrooms}+1`;
+    const propertyType = p.property_type || 'apartment';
+    const ownerType = p.owner_type;
+    const ptIcons: Record<string, string> = { apartment: '🏢', villa: '🏡', detached: '🏠', penthouse: '🌆', studio: '🔲', duplex: '🏘️', shop: '🏪', office: '🏛️', warehouse: '🏭', residential_land: '🌳', commercial_land: '🏗️', farmland: '🌾' };
+    const ptLabels: Record<string, { tr: string; en: string }> = { apartment: { tr: 'Daire', en: 'Apt' }, villa: { tr: 'Villa', en: 'Villa' }, detached: { tr: 'Müstakil', en: 'House' }, penthouse: { tr: 'Penthouse', en: 'PH' }, studio: { tr: 'Stüdyo', en: 'Studio' }, duplex: { tr: 'Dublex', en: 'Duplex' }, shop: { tr: 'Dükkan', en: 'Shop' }, office: { tr: 'Ofis', en: 'Office' }, warehouse: { tr: 'Depo', en: 'Storage' }, residential_land: { tr: 'Arsa', en: 'Land' }, commercial_land: { tr: 'T.Arsa', en: 'C.Land' }, farmland: { tr: 'Tarla', en: 'Farm' } };
+    const isLand = ['residential_land', 'commercial_land', 'farmland'].includes(propertyType);
 
     return (
         <a href={`/properties/${property.id}`} className="property-card">
@@ -24,12 +32,15 @@ function PropertyCard({ property, locale, isFav, onToggleFav, displayCurrency }:
                     <img src={property.photos[0]} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
                     <div className="property-image-placeholder">
-                        {property.bedrooms >= 4 ? '🏡' : property.bedrooms === 0 ? '🏠' : '🏢'}
+                        {ptIcons[propertyType] || '🏢'}
                     </div>
                 )}
                 <div className="property-badges">
                     <span className={`badge badge-${property.type}`}>
                         {isRent ? (locale === 'tr' ? 'Kiralık' : 'Rent') : (locale === 'tr' ? 'Satılık' : 'Sale')}
+                    </span>
+                    <span style={{ padding: '4px 8px', borderRadius: '9999px', fontSize: '0.7rem', fontWeight: 600, background: 'rgba(0,0,0,0.6)', color: 'white', backdropFilter: 'blur(4px)' }}>
+                        {ptIcons[propertyType] || '🏢'} {locale === 'tr' ? ptLabels[propertyType]?.tr : ptLabels[propertyType]?.en || propertyType}
                     </span>
                     {property.furnished && <span className="badge badge-new">{locale === 'tr' ? 'Eşyalı' : 'Furnished'}</span>}
                 </div>
@@ -59,8 +70,8 @@ function PropertyCard({ property, locale, isFav, onToggleFav, displayCurrency }:
                 <p className="property-location">📍 {property.district}, {property.city}</p>
 
                 <div className="property-meta">
-                    <span>🛏️ {property.bedrooms}</span>
-                    <span>🚿 {property.bathrooms}</span>
+                    {!isLand && <span>🏠 {roomConfig}</span>}
+                    {!isLand && <span>🚿 {property.bathrooms}</span>}
                     <span>📐 {property.area_sqm}m²</span>
                     {property.parking && <span>🅿️</span>}
                     {property.pool && <span>🏊</span>}
@@ -85,6 +96,15 @@ function PropertyCard({ property, locale, isFav, onToggleFav, displayCurrency }:
                                 💰 {property.deposit_amount} {locale === 'tr' ? 'kira depozito' : 'mo deposit'}
                             </span>
                         )}
+                    </div>
+                )}
+
+                {/* Owner type badge */}
+                {ownerType && (
+                    <div style={{ display: 'flex', gap: '4px', marginBottom: '6px' }}>
+                        <span style={{ padding: '2px 8px', borderRadius: '9999px', fontSize: '0.7rem', fontWeight: 500, background: ownerType === 'owner' ? 'rgba(16,185,129,0.1)' : 'rgba(99,102,241,0.1)', color: ownerType === 'owner' ? '#10b981' : '#6366f1' }}>
+                            {ownerType === 'owner' ? '👤' : '🏢'} {ownerType === 'owner' ? (locale === 'tr' ? 'Sahibinden' : 'Owner') : (locale === 'tr' ? 'Emlakçı' : 'Agent')}
+                        </span>
                     </div>
                 )}
 
