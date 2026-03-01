@@ -322,7 +322,7 @@ function AddPropertyContent() {
 
                             {/* Photo Upload */}
                             <div>
-                                <label style={labelStyle}>📷 {isTR ? 'Fotoğraflar (max 8)' : 'Photos (max 8)'}</label>
+                                <label style={labelStyle}>📷 {isTR ? 'Fotoğraflar (max 10)' : 'Photos (max 10)'}</label>
                                 <div
                                     onClick={() => fileInputRef.current?.click()}
                                     style={{
@@ -352,11 +352,11 @@ function AddPropertyContent() {
                                         if (validFiles.length < allFiles.length) {
                                             alert(isTR ? `${allFiles.length - validFiles.length} dosya 5MB limitini aşıyor ve eklenmedi.` : `${allFiles.length - validFiles.length} file(s) exceed 5MB limit and were skipped.`);
                                         }
-                                        const files = validFiles.slice(0, 8 - photos.length);
+                                        const files = validFiles.slice(0, 10 - photos.length);
                                         if (files.length === 0) return;
-                                        setPhotos(prev => [...prev, ...files].slice(0, 8));
+                                        setPhotos(prev => [...prev, ...files].slice(0, 10));
                                         const newPreviews = files.map(f => URL.createObjectURL(f));
-                                        setPhotoPreviews(prev => [...prev, ...newPreviews].slice(0, 8));
+                                        setPhotoPreviews(prev => [...prev, ...newPreviews].slice(0, 10));
                                         e.target.value = '';
                                     }}
                                 />
