@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { type Locale, localeNames, localeFlags, locales, t } from '@/i18n/translations';
 import { getCurrentUser, onAuthChange } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
+import { uploadPropertyPhoto } from '@/lib/storage';
 import AuthModal from '@/components/AuthModal';
 import ChatbotWidget from '@/components/ChatbotWidget';
 import '../properties/properties.css';
@@ -17,6 +18,10 @@ export default function AddPropertyPage() {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
+    const [photos, setPhotos] = useState<File[]>([]);
+    const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+    const [uploadProgress, setUploadProgress] = useState('');
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [form, setForm] = useState({
         title_tr: '', title_en: '',
@@ -69,6 +74,18 @@ export default function AddPropertyPage() {
             .map(l => l.trim())
             .filter(l => l.length > 0);
 
+        // Upload photos
+        const photoUrls: string[] = [];
+        if (photos.length > 0) {
+            setUploadProgress(isTR ? 'Fotoğraflar yükleniyor...' : 'Uploading photos...');
+            for (let i = 0; i < photos.length; i++) {
+                setUploadProgress(`${isTR ? 'Fotoğraf' : 'Photo'} ${i + 1}/${photos.length}`);
+                const url = await uploadPropertyPhoto(photos[i]);
+                if (url) photoUrls.push(url);
+            }
+            setUploadProgress('');
+        }
+
         const { error: insertError } = await supabase.from('properties').insert({
             title_tr: form.title_tr,
             title_en: form.title_en || form.title_tr,
@@ -85,7 +102,7 @@ export default function AddPropertyPage() {
             area_sqm: Number(form.area_sqm),
             furnished: form.furnished,
             features: featuresArr,
-            photos: [],
+            photos: photoUrls,
             cyprusnest_score: null,
             views_count: 0,
             deposit_amount: Number(form.deposit_amount),
@@ -276,6 +293,59 @@ export default function AddPropertyPage() {
                                     placeholder="Klima, Otopark, Havuz, Wi-Fi" style={inputStyle} />
                             </div>
 
+                            {/* Photo Upload */}
+                            <div>
+                                <label style={labelStyle}>📷 {isTR ? 'Fotoğraflar (max 8)' : 'Photos (max 8)'}</label>
+                                <div
+                                    onClick={() => fileInputRef.current?.click()}
+                                    style={{
+                                        border: '2px dashed var(--border)', borderRadius: 'var(--radius-md)',
+                                        padding: '24px', textAlign: 'center', cursor: 'pointer',
+                                        background: 'rgba(14,165,233,0.03)', transition: 'all 0.2s',
+                                    }}
+                                >
+                                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📷</div>
+                                    <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                                        {isTR ? 'Tıklayın veya fotoğraf sürükleyin' : 'Click or drag photos here'}
+                                    </p>
+                                    <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '4px' }}>
+                                        JPG, PNG, WebP — max 5MB
+                                    </p>
+                                </div>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp"
+                                    multiple
+                                    style={{ display: 'none' }}
+                                    onChange={(e) => {
+                                        const files = Array.from(e.target.files || []).slice(0, 8 - photos.length);
+                                        if (files.length === 0) return;
+                                        setPhotos(prev => [...prev, ...files].slice(0, 8));
+                                        const newPreviews = files.map(f => URL.createObjectURL(f));
+                                        setPhotoPreviews(prev => [...prev, ...newPreviews].slice(0, 8));
+                                        e.target.value = '';
+                                    }}
+                                />
+                                {photoPreviews.length > 0 && (
+                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
+                                        {photoPreviews.map((src, i) => (
+                                            <div key={i} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+                                                <img src={src} alt={`Photo ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                <button type="button" onClick={() => {
+                                                    setPhotos(prev => prev.filter((_, idx) => idx !== i));
+                                                    setPhotoPreviews(prev => prev.filter((_, idx) => idx !== i));
+                                                }} style={{
+                                                    position: 'absolute', top: '2px', right: '2px', width: '20px', height: '20px',
+                                                    background: 'rgba(239,68,68,0.9)', color: 'white', border: 'none', borderRadius: '50%',
+                                                    fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                }}>✕</button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
                             {/* KKTC-Specific: Rental Fields */}
                             {form.type === 'rent' && (
                                 <>
@@ -365,7 +435,7 @@ export default function AddPropertyPage() {
                             )}
 
                             <button type="submit" disabled={loading || !user} className="btn btn-primary btn-lg" style={{ opacity: (loading || !user) ? 0.5 : 1 }}>
-                                {loading ? '⏳...' : isTR ? '📤 İlanı Gönder' : '📤 Submit Listing'}
+                                {loading ? (uploadProgress || '⏳...') : isTR ? '📤 İlanı Gönder' : '📤 Submit Listing'}
                             </button>
                         </form>
                     )}

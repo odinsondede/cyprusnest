@@ -18,11 +18,13 @@ function PropertyCard({ property, locale, isFav, onToggleFav, displayCurrency }:
     return (
         <a href={`/properties/${property.id}`} className="property-card">
             <div className="property-image">
-                <div className="property-image-placeholder">
-                    {property.bedrooms >= 4 ? '🏡' :
-                        property.bedrooms === 0 ? '🏠' :
-                            property.area_sqm > 150 ? '🏢' : '🏢'}
-                </div>
+                {property.photos && property.photos.length > 0 ? (
+                    <img src={property.photos[0]} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                    <div className="property-image-placeholder">
+                        {property.bedrooms >= 4 ? '🏡' : property.bedrooms === 0 ? '🏠' : '🏢'}
+                    </div>
+                )}
                 <div className="property-badges">
                     <span className={`badge badge-${property.type}`}>
                         {isRent ? (locale === 'tr' ? 'Kiralık' : 'Rent') : (locale === 'tr' ? 'Satılık' : 'Sale')}
