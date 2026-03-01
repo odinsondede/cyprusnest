@@ -6,6 +6,9 @@ export async function getProperties(filters?: {
     type?: 'rent' | 'sale';
     city?: string;
     search?: string;
+    property_type?: string;
+    price_min?: number;
+    price_max?: number;
     sortBy?: 'newest' | 'price-low' | 'price-high' | 'score';
     limit?: number;
     offset?: number;
@@ -26,6 +29,15 @@ export async function getProperties(filters?: {
     }
     if (filters?.search) {
         query = query.or(`title_tr.ilike.%${filters.search}%,title_en.ilike.%${filters.search}%,district.ilike.%${filters.search}%,city.ilike.%${filters.search}%`);
+    }
+    if (filters?.property_type) {
+        query = query.eq('property_type', filters.property_type);
+    }
+    if (filters?.price_min) {
+        query = query.gte('price', filters.price_min);
+    }
+    if (filters?.price_max) {
+        query = query.lte('price', filters.price_max);
     }
 
     switch (filters?.sortBy) {

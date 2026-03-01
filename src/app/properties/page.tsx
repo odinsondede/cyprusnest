@@ -159,6 +159,11 @@ function PropertiesContent() {
         available_now: false, bills_included: false, furnished: false,
         parking: false, pool: false, sea_view: false,
     });
+    const [propertyTypeFilter, setPropertyTypeFilter] = useState('all');
+    const [roomConfigFilter, setRoomConfigFilter] = useState('all');
+    const [priceMin, setPriceMin] = useState('');
+    const [priceMax, setPriceMax] = useState('');
+    const [showAdvanced, setShowAdvanced] = useState(false);
 
     function toggleQuick(key: keyof typeof quickFilters) {
         setQuickFilters(prev => ({ ...prev, [key]: !prev[key] }));
@@ -171,6 +176,8 @@ function PropertiesContent() {
         if (quickFilters.parking && !p.parking) return false;
         if (quickFilters.pool && !p.pool) return false;
         if (quickFilters.sea_view && !p.sea_view) return false;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if (roomConfigFilter !== 'all' && (p as any).room_config !== roomConfigFilter) return false;
         return true;
     });
 
@@ -192,6 +199,9 @@ function PropertiesContent() {
                 type: typeFilter === 'all' ? undefined : typeFilter,
                 city: cityFilter === 'all' ? undefined : cityFilter,
                 search: searchQuery || undefined,
+                property_type: propertyTypeFilter === 'all' ? undefined : propertyTypeFilter,
+                price_min: priceMin ? Number(priceMin) : undefined,
+                price_max: priceMax ? Number(priceMax) : undefined,
                 sortBy,
                 offset: 0,
             });
@@ -201,7 +211,7 @@ function PropertiesContent() {
             setLoading(false);
         }
         fetchData();
-    }, [typeFilter, cityFilter, searchQuery, sortBy]);
+    }, [typeFilter, cityFilter, searchQuery, sortBy, propertyTypeFilter, priceMin, priceMax]);
 
     async function loadMore() {
         setLoadingMore(true);
@@ -283,6 +293,106 @@ function PropertiesContent() {
                             {currencies.map(c => <option key={c} value={c}>{{ GBP: '£ GBP', EUR: '€ EUR', USD: '$ USD', TRY: '₺ TRY' }[c]}</option>)}
                         </select>
                     </div>
+
+                    {/* Advanced filter toggle */}
+                    <button onClick={() => setShowAdvanced(!showAdvanced)}
+                        style={{
+                            display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px',
+                            background: 'none', border: 'none', color: 'var(--primary-light)',
+                            fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', padding: '4px 0',
+                        }}>
+                        {showAdvanced ? '▼' : '▶'} {locale === 'tr' ? 'Gelişmiş Filtreler' : 'Advanced Filters'}
+                        {(propertyTypeFilter !== 'all' || roomConfigFilter !== 'all' || priceMin || priceMax) && (
+                            <span style={{ background: 'var(--primary)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem' }}>
+                                {[propertyTypeFilter !== 'all', roomConfigFilter !== 'all', !!priceMin, !!priceMax].filter(Boolean).length}
+                            </span>
+                        )}
+                    </button>
+
+                    {/* Advanced filter panel */}
+                    {showAdvanced && (
+                        <div style={{
+                            padding: '16px', background: 'var(--bg-card)', border: '1px solid var(--border)',
+                            borderRadius: 'var(--radius-lg)', marginBottom: '20px',
+                            display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px',
+                        }}>
+                            {/* Property Type */}
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '6px' }}>
+                                    🏠 {locale === 'tr' ? 'Mülk Tipi' : 'Property Type'}
+                                </label>
+                                <select value={propertyTypeFilter} onChange={e => setPropertyTypeFilter(e.target.value)}
+                                    style={{ width: '100%', padding: '8px 12px', background: 'var(--bg-darker)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)', fontSize: '0.85rem' }}>
+                                    <option value="all">{locale === 'tr' ? 'Tümü' : 'All'}</option>
+                                    <optgroup label={locale === 'tr' ? '🏠 Konut' : '🏠 Residential'}>
+                                        <option value="apartment">{locale === 'tr' ? 'Daire' : 'Apartment'}</option>
+                                        <option value="villa">Villa</option>
+                                        <option value="detached">{locale === 'tr' ? 'Müstakil' : 'Detached'}</option>
+                                        <option value="penthouse">Penthouse</option>
+                                        <option value="studio">{locale === 'tr' ? 'Stüdyo' : 'Studio'}</option>
+                                        <option value="duplex">{locale === 'tr' ? 'Dubleks' : 'Duplex'}</option>
+                                    </optgroup>
+                                    <optgroup label={locale === 'tr' ? '🏪 Ticari' : '🏪 Commercial'}>
+                                        <option value="shop">{locale === 'tr' ? 'Dükkan' : 'Shop'}</option>
+                                        <option value="office">{locale === 'tr' ? 'Ofis' : 'Office'}</option>
+                                        <option value="warehouse">{locale === 'tr' ? 'Depo' : 'Warehouse'}</option>
+                                    </optgroup>
+                                    <optgroup label={locale === 'tr' ? '🌍 Arsa' : '🌍 Land'}>
+                                        <option value="residential_land">{locale === 'tr' ? 'Konut Arsası' : 'Residential Land'}</option>
+                                        <option value="commercial_land">{locale === 'tr' ? 'Ticari Arsa' : 'Commercial Land'}</option>
+                                        <option value="farmland">{locale === 'tr' ? 'Tarla' : 'Farmland'}</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+
+                            {/* Room Config */}
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '6px' }}>
+                                    🛏️ {locale === 'tr' ? 'Oda' : 'Rooms'}
+                                </label>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                                    {['all', '1+0', '1+1', '2+1', '3+1', '4+1', '5+'].map(rc => (
+                                        <button key={rc} onClick={() => setRoomConfigFilter(rc)}
+                                            style={{
+                                                padding: '5px 10px', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 500,
+                                                border: roomConfigFilter === rc ? '1.5px solid var(--primary)' : '1px solid var(--border)',
+                                                background: roomConfigFilter === rc ? 'rgba(14,165,233,0.15)' : 'var(--bg-darker)',
+                                                color: roomConfigFilter === rc ? 'var(--primary-light)' : 'var(--text-muted)',
+                                                cursor: 'pointer', transition: 'all 0.15s',
+                                            }}>
+                                            {rc === 'all' ? (locale === 'tr' ? 'Tümü' : 'All') : rc}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Price Range */}
+                            <div>
+                                <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '6px' }}>
+                                    💰 {locale === 'tr' ? 'Fiyat Aralığı (£)' : 'Price Range (£)'}
+                                </label>
+                                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                    <input type="number" placeholder="Min" value={priceMin}
+                                        onChange={e => setPriceMin(e.target.value)}
+                                        style={{ width: '100%', padding: '7px 10px', background: 'var(--bg-darker)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
+                                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>–</span>
+                                    <input type="number" placeholder="Max" value={priceMax}
+                                        onChange={e => setPriceMax(e.target.value)}
+                                        style={{ width: '100%', padding: '7px 10px', background: 'var(--bg-darker)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)', fontSize: '0.85rem' }} />
+                                </div>
+                            </div>
+
+                            {/* Reset */}
+                            {(propertyTypeFilter !== 'all' || roomConfigFilter !== 'all' || priceMin || priceMax) && (
+                                <div style={{ gridColumn: '1 / -1' }}>
+                                    <button onClick={() => { setPropertyTypeFilter('all'); setRoomConfigFilter('all'); setPriceMin(''); setPriceMax(''); }}
+                                        style={{ padding: '6px 16px', borderRadius: 'var(--radius-md)', fontSize: '0.8rem', fontWeight: 600, background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)', cursor: 'pointer' }}>
+                                        🗑️ {locale === 'tr' ? 'Filtreleri Temizle' : 'Clear Filters'}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     {/* Quick filter chips */}
                     <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '20px' }}>
