@@ -153,31 +153,33 @@ export default function ProfilePage() {
                     ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             {myListings.map(p => (
-                                <a key={p.id} href={`/properties/${p.id}`} style={{
+                                <div key={p.id} style={{
                                     background: 'var(--bg-card)', border: '1px solid var(--border)',
                                     borderRadius: 'var(--radius-lg)', padding: '16px',
                                     display: 'grid', gridTemplateColumns: '80px 1fr auto', gap: '16px',
-                                    alignItems: 'center', textDecoration: 'none', transition: 'border-color 0.15s',
+                                    alignItems: 'center', transition: 'border-color 0.15s',
                                 }}>
-                                    <div style={{
-                                        width: '80px', height: '60px', borderRadius: 'var(--radius-md)',
-                                        overflow: 'hidden', background: 'var(--bg-darker)',
-                                    }}>
-                                        {p.photos?.[0] ? (
-                                            <img src={p.photos[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                        ) : (
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: '1.5rem' }}>🏠</div>
-                                        )}
-                                    </div>
-                                    <div>
+                                    <a href={`/properties/${p.id}`} style={{ textDecoration: 'none' }}>
+                                        <div style={{
+                                            width: '80px', height: '60px', borderRadius: 'var(--radius-md)',
+                                            overflow: 'hidden', background: 'var(--bg-darker)',
+                                        }}>
+                                            {p.photos?.[0] ? (
+                                                <img src={p.photos[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            ) : (
+                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: '1.5rem' }}>🏠</div>
+                                            )}
+                                        </div>
+                                    </a>
+                                    <a href={`/properties/${p.id}`} style={{ textDecoration: 'none' }}>
                                         <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.95rem' }}>
                                             {p.title_tr || p.title_en}
                                         </div>
                                         <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
                                             📍 {p.district}, {p.city} · 🛏️ {p.bedrooms} · £{p.price.toLocaleString()}{p.type === 'rent' ? '/mo' : ''}
                                         </div>
-                                    </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                                    </a>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
                                         <span style={{
                                             padding: '3px 10px', borderRadius: '9999px', fontSize: '0.7rem', fontWeight: 600,
                                             background: p.status === 'active' ? 'rgba(16,185,129,0.15)' : p.status === 'pending' ? 'rgba(245,158,11,0.15)' : 'rgba(239,68,68,0.15)',
@@ -186,11 +188,37 @@ export default function ProfilePage() {
                                             {p.status === 'active' ? '✅ ' : p.status === 'pending' ? '⏳ ' : '❌ '}
                                             {p.status}
                                         </span>
-                                        <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>
-                                            👁️ {p.views_count}
-                                        </span>
+                                        <div style={{ display: 'flex', gap: '6px' }}>
+                                            <a
+                                                href={`/add-property?edit=${p.id}`}
+                                                style={{
+                                                    padding: '4px 10px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 600,
+                                                    background: 'rgba(27,107,147,0.1)', color: 'var(--primary)',
+                                                    border: '1px solid rgba(27,107,147,0.2)', textDecoration: 'none',
+                                                    transition: 'all 0.15s',
+                                                }}
+                                            >
+                                                ✏️ {isTR ? 'Düzenle' : 'Edit'}
+                                            </a>
+                                            <button
+                                                onClick={async () => {
+                                                    if (confirm(isTR ? 'Bu ilanı silmek istediğinize emin misiniz?' : 'Are you sure you want to delete this listing?')) {
+                                                        await supabase.from('properties').delete().eq('id', p.id);
+                                                        if (user) loadMyListings(user.id);
+                                                    }
+                                                }}
+                                                style={{
+                                                    padding: '4px 10px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 600,
+                                                    background: 'rgba(239,68,68,0.1)', color: '#ef4444',
+                                                    border: '1px solid rgba(239,68,68,0.2)', cursor: 'pointer',
+                                                    transition: 'all 0.15s',
+                                                }}
+                                            >
+                                                🗑️ {isTR ? 'Sil' : 'Delete'}
+                                            </button>
+                                        </div>
                                     </div>
-                                </a>
+                                </div>
                             ))}
                         </div>
                     )}

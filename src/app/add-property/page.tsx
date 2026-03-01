@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { type Locale, t } from '@/i18n/translations';
 import { getCurrentUser, onAuthChange } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
@@ -8,11 +8,14 @@ import { uploadPropertyPhoto } from '@/lib/storage';
 import AuthModal from '@/components/AuthModal';
 import Navbar from '@/components/Navbar';
 import ChatbotWidget from '@/components/ChatbotWidget';
+import { useSearchParams } from 'next/navigation';
 import '../properties/properties.css';
 
 const cities = ['Lefkoşa', 'Girne', 'Gazimağusa', 'İskele', 'Güzelyurt', 'Lefke'];
 
-export default function AddPropertyPage() {
+function AddPropertyContent() {
+    const searchParams = useSearchParams();
+    const editId = searchParams.get('edit');
     const [locale, setLocale] = useState<Locale>('tr');
     const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
     const [showAuth, setShowAuth] = useState(false);
@@ -50,10 +53,44 @@ export default function AddPropertyPage() {
     const isTR = locale === 'tr';
 
     useEffect(() => {
-        getCurrentUser().then(u => setUser(u as { id: string; email?: string } | null));
+        getCurrentUser().then(u => {
+            setUser(u as { id: string; email?: string } | null);
+            if (u && editId) loadPropertyForEdit(editId);
+        });
         const { data: { subscription } } = onAuthChange((u) => setUser(u as { id: string; email?: string } | null));
         return () => subscription.unsubscribe();
     }, []);
+
+    async function loadPropertyForEdit(id: string) {
+        const { data } = await supabase.from('properties').select('*').eq('id', id).single();
+        if (data) {
+            setForm({
+                title_tr: data.title_tr || '', title_en: data.title_en || '',
+                description_tr: data.description_tr || '', description_en: data.description_en || '',
+                type: data.type || 'rent',
+                price: String(data.price || ''),
+                city: data.city || 'Lefkoşa',
+                district: data.district || '',
+                bedrooms: String(data.bedrooms || '1'), bathrooms: String(data.bathrooms || '1'),
+                area_sqm: String(data.area_sqm || ''),
+                furnished: data.furnished || false,
+                features: (data.features || []).join(', '),
+                deposit_amount: String(data.deposit_amount || '1'),
+                contract_type: data.contract_type || 'yearly',
+                title_deed_type: data.title_deed_type || 'turkish',
+                bills_included: data.bills_included || false,
+                available_now: data.available_now ?? true,
+                monthly_fees: String(data.monthly_fees || '0'),
+                nearby_landmarks: (data.nearby_landmarks || []).join(', '),
+                parking: data.parking || false,
+                pool: data.pool || false,
+                sea_view: data.sea_view || false,
+            });
+            if (data.photos && data.photos.length > 0) {
+                setPhotoPreviews(data.photos);
+            }
+        }
+    }
 
     function updateForm(field: string, value: string | boolean) {
         setForm(prev => ({ ...prev, [field]: value }));
@@ -87,7 +124,7 @@ export default function AddPropertyPage() {
             setUploadProgress('');
         }
 
-        const { error: insertError } = await supabase.from('properties').insert({
+        const propertyData = {
             title_tr: form.title_tr,
             title_en: form.title_en || form.title_tr,
             description_tr: form.description_tr,
@@ -103,9 +140,7 @@ export default function AddPropertyPage() {
             area_sqm: Number(form.area_sqm),
             furnished: form.furnished,
             features: featuresArr,
-            photos: photoUrls,
-            cyprusnest_score: null,
-            views_count: 0,
+            photos: photoUrls.length > 0 ? photoUrls : (editId ? photoPreviews : []),
             deposit_amount: Number(form.deposit_amount),
             contract_type: form.contract_type,
             title_deed_type: form.title_deed_type,
@@ -116,7 +151,16 @@ export default function AddPropertyPage() {
             parking: form.parking,
             pool: form.pool,
             sea_view: form.sea_view,
-        });
+        };
+
+        let insertError;
+        if (editId) {
+            const { error } = await supabase.from('properties').update(propertyData).eq('id', editId);
+            insertError = error;
+        } else {
+            const { error } = await supabase.from('properties').insert({ ...propertyData, cyprusnest_score: null, views_count: 0 });
+            insertError = error;
+        }
 
         if (insertError) {
             setError(insertError.message);
@@ -144,10 +188,10 @@ export default function AddPropertyPage() {
             <main style={{ paddingTop: '100px', paddingBottom: '64px', minHeight: '100vh' }}>
                 <div className="container" style={{ maxWidth: '700px' }}>
                     <h1 style={{ color: 'var(--text-primary)', marginBottom: '8px', fontSize: '1.6rem' }}>
-                        {isTR ? '➕ Yeni İlan Ekle' : '➕ Add New Listing'}
+                        {editId ? (isTR ? '✏️ İlanı Düzenle' : '✏️ Edit Listing') : (isTR ? '➕ Yeni İlan Ekle' : '➕ Add New Listing')}
                     </h1>
                     <p style={{ color: 'var(--text-muted)', marginBottom: '32px' }}>
-                        {isTR ? 'İlanınız incelendikten sonra yayınlanacaktır.' : 'Your listing will be published after review.'}
+                        {editId ? (isTR ? 'Değişiklikleriniz kaydedilecektir.' : 'Your changes will be saved.') : (isTR ? 'İlanınız incelendikten sonra yayınlanacaktır.' : 'Your listing will be published after review.')}
                     </p>
 
                     {!user && (
@@ -418,7 +462,7 @@ export default function AddPropertyPage() {
                             )}
 
                             <button type="submit" disabled={loading || !user} className="btn btn-primary btn-lg" style={{ opacity: (loading || !user) ? 0.5 : 1 }}>
-                                {loading ? (uploadProgress || '⏳...') : isTR ? '📤 İlanı Gönder' : '📤 Submit Listing'}
+                                {loading ? (uploadProgress || '⏳...') : editId ? (isTR ? '✅ İlanı Güncelle' : '✅ Update Listing') : (isTR ? '📤 İlanı Gönder' : '📤 Submit Listing')}
                             </button>
                         </form>
                     )}
@@ -428,5 +472,13 @@ export default function AddPropertyPage() {
             <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} locale={locale} />
             <ChatbotWidget locale={locale} />
         </div>
+    );
+}
+
+export default function AddPropertyPage() {
+    return (
+        <Suspense fallback={<div style={{ minHeight: '100vh', paddingTop: '120px', textAlign: 'center' }}>Yükleniyor...</div>}>
+            <AddPropertyContent />
+        </Suspense>
     );
 }
