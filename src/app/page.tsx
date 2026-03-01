@@ -87,17 +87,12 @@ export default function Home() {
       {/* ========== HERO — Split Layout ========== */}
       <section className="hero" style={{ minHeight: 'auto', padding: '120px 0 60px' }}>
         <div className="container">
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '48px',
-            alignItems: 'center',
-          }}>
+          <div className="hero-split">
             {/* Left — Text */}
             <div>
               <div className="hero-badge">{txt.tagline}</div>
 
-              <h1 className="hero-title" style={{ textAlign: 'left', fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
+              <h1 className="hero-title" style={{ textAlign: 'left', fontSize: 'clamp(2rem, 4vw, 3.5rem)' }}>
                 {txt.title}<br />
                 <span className="highlight">{txt.titleHighlight}</span>
               </h1>
@@ -107,7 +102,7 @@ export default function Home() {
               </p>
 
               {/* Type Toggle */}
-              <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+              <div className="hero-type-toggle">
                 <button
                   onClick={() => setListingType('rent')}
                   className={`btn ${listingType === 'rent' ? 'btn-primary' : 'btn-outline'}`}
@@ -138,13 +133,7 @@ export default function Home() {
               </form>
 
               {/* Trust Signals */}
-              <div style={{
-                display: 'flex',
-                gap: '20px',
-                fontSize: '0.85rem',
-                color: 'var(--text-secondary)',
-                flexWrap: 'wrap',
-              }}>
+              <div className="hero-trust-signals">
                 <span>🤖 {txt.trust1}</span>
                 <span>🌍 {txt.trust2}</span>
                 <span>✅ {txt.trust3}</span>
@@ -152,36 +141,9 @@ export default function Home() {
             </div>
 
             {/* Right — Hero Image */}
-            <div style={{
-              borderRadius: '20px',
-              overflow: 'hidden',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.12)',
-              aspectRatio: '4/3',
-              position: 'relative',
-            }}>
-              <img
-                src="/hero-villa.png"
-                alt="North Cyprus Mediterranean Villa"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  display: 'block',
-                }}
-              />
-              <div style={{
-                position: 'absolute',
-                bottom: '16px',
-                left: '16px',
-                background: 'rgba(255,255,255,0.92)',
-                backdropFilter: 'blur(10px)',
-                borderRadius: '12px',
-                padding: '10px 16px',
-                fontSize: '0.85rem',
-                fontWeight: 600,
-                color: 'var(--primary)',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
-              }}>
+            <div className="hero-image-wrapper">
+              <img src="/hero-villa.png" alt="North Cyprus Mediterranean Villa" />
+              <div className="hero-image-badge">
                 📍 {locale === 'tr' ? 'Girne, KKTC' : 'Kyrenia, KKTC'}
               </div>
             </div>
@@ -197,39 +159,12 @@ export default function Home() {
             <p className="section-subtitle">{txt.citiesSubtitle}</p>
           </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '16px',
-          }}>
+          <div className="cities-grid">
             {cities.map((city) => (
               <a
                 key={city.name}
                 href={`/properties?city=${city.name}`}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '28px 16px',
-                  background: 'var(--bg-card)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '16px',
-                  textDecoration: 'none',
-                  transition: 'all 0.3s ease',
-                  cursor: 'pointer',
-                  textAlign: 'center',
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)';
-                  (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 32px rgba(0,0,0,0.08)';
-                  (e.currentTarget as HTMLElement).style.borderColor = city.color;
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
-                  (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)';
-                }}
+                className="city-card"
               >
                 <span style={{ fontSize: '2rem' }}>{city.emoji}</span>
                 <span style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--text-primary)' }}>{city.name}</span>
@@ -255,11 +190,7 @@ export default function Home() {
             <p className="section-subtitle">{txt.whySubtitle}</p>
           </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '20px',
-          }}>
+          <div className="why-grid">
             {[
               { icon: '🤖', title: txt.why1Title, desc: txt.why1Desc, color: '#1B6B93' },
               { icon: '🌍', title: txt.why2Title, desc: txt.why2Desc, color: '#2D8B5C' },
@@ -268,22 +199,7 @@ export default function Home() {
             ].map((f) => (
               <div
                 key={f.title}
-                style={{
-                  padding: '28px 20px',
-                  background: 'var(--bg-card)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '16px',
-                  textAlign: 'center',
-                  transition: 'all 0.3s ease',
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)';
-                  (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 32px rgba(0,0,0,0.06)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
-                }}
+                className="why-card"
               >
                 <div style={{
                   width: '48px',
