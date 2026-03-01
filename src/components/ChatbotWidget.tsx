@@ -10,10 +10,10 @@ interface ChatMessage {
 
 const WELCOME_MESSAGES: Record<string, string> = {
     tr: 'Merhaba! 👋 Ben Evlek AI asistanınızım. KKTC\'de mülk aramanızda size yardımcı olabilirim. Bütçenizi, bölgenizi veya arzu ettiğiniz özellikleri söyleyin!',
-    en: 'Hello! 👋 I\'m your Evlek AI assistant. I can help you find properties in North Cyprus. Tell me your budget, preferred area, or desired features!',
-    ru: 'Привет! 👋 Я AI-ассистент Evlek. Помогу найти недвижимость на Северном Кипре. Расскажите о бюджете, районе или пожеланиях!',
-    de: 'Hallo! 👋 Ich bin Ihr Evlek KI-Assistent. Ich helfe Ihnen, Immobilien in Nordzypern zu finden!',
-    ar: 'مرحباً! 👋 أنا مساعد Evlek الذكي. يمكنني مساعدتك في العثور على عقارات في شمال قبرص!',
+    en: 'Hello! 👋 I\'m Evlek AI assistant. I can help you find properties in North Cyprus. Tell me your budget, preferred area, or desired features!',
+    ru: 'Привет! 👋 Я AI-помощник Evlek. Помогу найти недвижимость на Северном Кипре. Расскажите о бюджете, районе или желаемых особенностях!',
+    de: 'Hallo! 👋 Ich bin der Evlek KI-Assistent. Ich helfe Ihnen bei der Immobiliensuche in Nordzypern!',
+    ar: '!مرحباً! 👋 أنا مساعد إيفلك الذكي. يمكنني مساعدتك في البحث عن عقارات في شمال قبرص',
 };
 
 const PLACEHOLDER: Record<string, string> = {
@@ -24,135 +24,142 @@ const PLACEHOLDER: Record<string, string> = {
     ar: '...اكتب رسالتك',
 };
 
-// Simple local AI response (no API needed for demo)
-function getLocalResponse(input: string, locale: string): string {
-    const q = input.toLowerCase();
+const OFFLINE_RESPONSES: Record<string, Record<string, string>> = {
+    tr: {
+        fiyat: '💰 KKTC\'de kiralık daireler 300-800£/ay, satılık daireler 50.000-200.000£ arasında değişir. Detaylı arama için İlanlar sayfamızı ziyaret edin!',
+        kira: '🏠 Kiralık ilanlarımızı görmek için: evlek.app/properties?type=rent adresini ziyaret edin!',
+        girne: '⛵ Girne, turistik bölge olarak yatırım getirisi yüksek. Deniz manzaralı daireler popüler. İlanlarımızı inceleyin!',
+        lefkosa: '🏛️ Lefkoşa merkezi, üniversite bölgeleri (Gönyeli, Hamitköy) öğrenci kiralamaları için ideal.',
+        ptp: '⚖️ PTP (Satın Alma İzni) yabancılar için gereklidir. Süre: 6-24 ay. Detaylar için Hukuki Rehber sayfamızı ziyaret edin: evlek.app/legal',
+        vergi: '💰 Vergi hesaplayıcımızı kullanın: evlek.app/legal — Damga vergisi, KDV, tapu harcı dahil.',
+        default: '🤔 Bu konuda size yardımcı olayım! Lütfen bütçenizi, tercih ettiğiniz bölgeyi veya mülk tipini belirtin. AI servisimiz şu an yapılandırılıyor — yakında çok daha detaylı cevaplar alacaksınız!',
+    },
+    en: {
+        price: '💰 Rentals in KKTC range from £300-800/month, sales from £50,000-200,000. Visit our listings for detailed search!',
+        rent: '🏠 See rental listings at: evlek.app/properties?type=rent',
+        kyrenia: '⛵ Kyrenia offers high investment returns as a tourist area. Sea view apartments are popular!',
+        nicosia: '🏛️ Central Nicosia and university areas (Gönyeli, Hamitköy) are ideal for student rentals.',
+        ptp: '⚖️ PTP (Permission to Purchase) is required for foreigners. Timeline: 6-24 months. Visit our Legal Guide: evlek.app/legal',
+        tax: '💰 Use our tax calculator: evlek.app/legal — Includes stamp duty, VAT, transfer tax.',
+        default: '🤔 Let me help you! Please specify your budget, preferred area, or property type. Our AI service is being configured — you\'ll get much more detailed answers soon!',
+    },
+};
 
-    if (q.includes('rent') || q.includes('kiralık') || q.includes('kira') || q.includes('аренд')) {
-        return locale === 'tr'
-            ? '🏠 KKTC\'de kiralık daireler £250-800/ay arasında. Girne en popüler bölge. Hangi bölgeyi tercih edersiniz? Bütçeniz nedir?'
-            : '🏠 Rental apartments in North Cyprus range from £250-800/month. Kyrenia is the most popular area. Which area do you prefer? What\'s your budget?';
-    }
-    if (q.includes('buy') || q.includes('satılık') || q.includes('satın') || q.includes('покуп') || q.includes('kaufen')) {
-        return locale === 'tr'
-            ? '🏷️ KKTC\'de satılık daireler £70K-£500K+ arasında. Yabancı alıcılar max 3 daire alabilir (yeni yasa). Legal Wizard\'ı kullanarak tüm süreci öğrenebilirsiniz.'
-            : '🏷️ Apartments for sale in North Cyprus range from £70K-£500K+. Foreign buyers can purchase up to 3 apartments (new law). Use our Legal Wizard to understand the full process.';
-    }
-    if (q.includes('kyrenia') || q.includes('girne')) {
-        return locale === 'tr'
-            ? '🌊 Girne — KKTC\'nin en popüler şehri! Ortalama fiyat: £1,582/m². Çatalköy, Alsancak ve Lapta en çok tercih edilen bölgeler. Kira getirisi %8-12 arası.'
-            : '🌊 Kyrenia is the most popular city in North Cyprus! Average price: £1,582/m². Catalkoy, Alsancak and Lapta are the most preferred areas. Rental yield 8-12%.';
-    }
-    if (q.includes('iskele') || q.includes('long beach') || q.includes('bafra')) {
-        return locale === 'tr'
-            ? '🏖️ İskele — Hızla büyüyen yatırım bölgesi! Ortalama: £1,801/m². Long Beach ve Bafra\'da yeni projeler çok popüler. Yüksek kira getirisi potansiyeli.'
-            : '🏖️ Iskele is a fast-growing investment area! Average: £1,801/m². New projects in Long Beach and Bafra are very popular. High rental yield potential.';
-    }
-    if (q.includes('legal') || q.includes('hukuk') || q.includes('law') || q.includes('tapu') || q.includes('title')) {
-        return locale === 'tr'
-            ? '⚖️ KKTC\'de mülk satın alma süreci: 1) Mülk seç 2) Avukat tut 3) Sözleşme imzala 4) PTP başvurusu (6-12 ay) 5) Tapu devri. Legal Wizard\'da detaylı rehber var!'
-            : '⚖️ Buying property in North Cyprus: 1) Choose property 2) Hire a lawyer 3) Sign contract 4) Apply for PTP (6-12 months) 5) Title deed transfer. See our Legal Wizard for details!';
-    }
-    if (q.includes('price') || q.includes('fiyat') || q.includes('cost') || q.includes('цен') || q.includes('preis')) {
-        return locale === 'tr'
-            ? '💰 KKTC 2024 ortalama fiyatları:\n• Daire: £1,273/m² (+%14 yıllık)\n• Villa: £1,823/m² (+%14 yıllık)\n• Girne en pahalı, Lefkoşa en uygun bölge.'
-            : '💰 North Cyprus 2024 average prices:\n• Apartments: £1,273/m² (+14% YoY)\n• Villas: £1,823/m² (+14% YoY)\n• Kyrenia is the most expensive, Nicosia the most affordable.';
-    }
-    if (q.includes('staging') || q.includes('mobilya') || q.includes('furnish') || q.includes('render')) {
-        return locale === 'tr'
-            ? '🖼️ AI Virtual Staging ile boş odalarınızı 30 saniyede mobilyalı görsellere dönüştürün! 20+ dekorasyon stili. İlan sayfasından "AI Staging" butonuna tıklayın.'
-            : '🖼️ Transform empty rooms into furnished visuals in 30 seconds with AI Virtual Staging! 20+ design styles. Click the "AI Staging" button on any listing page.';
-    }
+function getOfflineResponse(input: string, locale: string): string {
+    const lower = input.toLowerCase();
+    const responses = OFFLINE_RESPONSES[locale] || OFFLINE_RESPONSES.en;
 
-    // Default
-    return locale === 'tr'
-        ? '🤔 Anlıyorum! Size yardımcı olabilmem için bölge tercihinizi (Girne, İskele, Lefkoşa, Gazimağusa), bütçenizi ve kiralık mı yoksa satılık mı aradığınızı söyleyebilir misiniz?'
-        : '🤔 I understand! To help you better, could you tell me your preferred area (Kyrenia, Iskele, Nicosia, Famagusta), your budget, and whether you\'re looking to rent or buy?';
+    for (const [keyword, response] of Object.entries(responses)) {
+        if (keyword !== 'default' && lower.includes(keyword)) {
+            return response;
+        }
+    }
+    return responses.default;
 }
 
 export default function ChatbotWidget({ locale }: { locale: Locale }) {
-    const [isOpen, setIsOpen] = useState(false);
+    const [open, setOpen] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([
-        { role: 'bot', content: WELCOME_MESSAGES[locale] || WELCOME_MESSAGES['en'] },
+        { role: 'bot', content: WELCOME_MESSAGES[locale] || WELCOME_MESSAGES.en },
     ]);
     const [input, setInput] = useState('');
-    const [isTyping, setIsTyping] = useState(false);
+    const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages, isTyping]);
+    }, [messages]);
 
     // Update welcome message when locale changes
     useEffect(() => {
-        setMessages([
-            { role: 'bot', content: WELCOME_MESSAGES[locale] || WELCOME_MESSAGES['en'] },
-        ]);
+        setMessages([{ role: 'bot', content: WELCOME_MESSAGES[locale] || WELCOME_MESSAGES.en }]);
     }, [locale]);
 
-    const handleSend = () => {
-        if (!input.trim()) return;
+    async function handleSend() {
+        const text = input.trim();
+        if (!text || loading) return;
 
-        const userMsg = input.trim();
-        setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+        const userMessage: ChatMessage = { role: 'user', content: text };
+        setMessages(prev => [...prev, userMessage]);
         setInput('');
-        setIsTyping(true);
+        setLoading(true);
 
-        // Simulate AI response delay
-        setTimeout(() => {
-            const response = getLocalResponse(userMsg, locale);
-            setMessages(prev => [...prev, { role: 'bot', content: response }]);
-            setIsTyping(false);
-        }, 800 + Math.random() * 600);
-    };
+        try {
+            // Build history for the API (exclude welcome message)
+            const history = messages.slice(1).map(m => ({
+                role: m.role === 'bot' ? 'assistant' : 'user',
+                content: m.content,
+            }));
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text, history, locale }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setMessages(prev => [...prev, { role: 'bot', content: data.reply }]);
+            } else {
+                // Fallback to offline responses
+                const fallback = getOfflineResponse(text, locale);
+                setMessages(prev => [...prev, { role: 'bot', content: fallback }]);
+            }
+        } catch {
+            // Network error: use offline responses
+            const fallback = getOfflineResponse(text, locale);
+            setMessages(prev => [...prev, { role: 'bot', content: fallback }]);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    function handleKeyDown(e: React.KeyboardEvent) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSend();
         }
-    };
+    }
 
     return (
         <div className="chatbot-fab">
-            {isOpen && (
+            {open && (
                 <div className="chatbot-panel">
                     <div className="chatbot-header">
-                        <h3>🤖 Evlek AI</h3>
-                        <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
+                        <h3 style={{ color: 'white' }}>🤖 Evlek AI</h3>
+                        <button className="close-btn" onClick={() => setOpen(false)}>✕</button>
                     </div>
 
                     <div className="chatbot-messages">
                         {messages.map((msg, i) => (
-                            <div key={i} className={`chat-message ${msg.role}`}>
+                            <div key={i} className={`chat-message ${msg.role === 'bot' ? 'bot' : 'user'}`}>
                                 {msg.content}
                             </div>
                         ))}
-                        {isTyping && (
-                            <div className="chat-message typing">●●●</div>
+                        {loading && (
+                            <div className="chat-message typing">
+                                {locale === 'tr' ? '🤖 Düşünüyor...' : '🤖 Thinking...'}
+                            </div>
                         )}
                         <div ref={messagesEndRef} />
                     </div>
 
                     <div className="chatbot-input">
                         <input
-                            type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            placeholder={PLACEHOLDER[locale] || PLACEHOLDER['en']}
+                            placeholder={PLACEHOLDER[locale] || PLACEHOLDER.en}
+                            disabled={loading}
                         />
-                        <button onClick={handleSend}>→</button>
+                        <button onClick={handleSend} disabled={loading || !input.trim()}>
+                            {loading ? '⏳' : '➤'}
+                        </button>
                     </div>
                 </div>
             )}
-
-            <button
-                className="chatbot-toggle"
-                onClick={() => setIsOpen(!isOpen)}
-                title="AI Assistant"
-            >
-                {isOpen ? '✕' : '🤖'}
+            <button className="chatbot-toggle" onClick={() => setOpen(!open)}>
+                {open ? '✕' : '🤖'}
             </button>
         </div>
     );

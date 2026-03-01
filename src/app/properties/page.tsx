@@ -311,7 +311,7 @@ function PropertiesContent() {
 
                     {/* Advanced filter panel */}
                     {showAdvanced && (
-                        <div style={{
+                        <div className="advanced-filters-grid" style={{
                             padding: '16px', background: 'var(--bg-card)', border: '1px solid var(--border)',
                             borderRadius: 'var(--radius-lg)', marginBottom: '20px',
                             display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px',

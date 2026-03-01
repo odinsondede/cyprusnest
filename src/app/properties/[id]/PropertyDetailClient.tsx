@@ -5,6 +5,7 @@ import { type Locale } from '@/i18n/translations';
 import { getPropertyById, formatPrice, getScoreColor } from '@/lib/properties';
 import { type Property } from '@/lib/supabase';
 import ChatbotWidget from '@/components/ChatbotWidget';
+import PhotoLightbox from '@/components/PhotoLightbox';
 import Navbar from '@/components/Navbar';
 import '../detail.css';
 import '../properties.css';
@@ -13,6 +14,8 @@ export default function PropertyDetailClient({ id }: { id: string }) {
     const [locale, setLocale] = useState<Locale>('tr');
     const [property, setProperty] = useState<Property | null>(null);
     const [loading, setLoading] = useState(true);
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [lightboxIndex, setLightboxIndex] = useState(0);
 
     useEffect(() => {
         async function fetchProperty() {
@@ -71,7 +74,12 @@ export default function PropertyDetailClient({ id }: { id: string }) {
                         <div className="detail-visual">
                             <div className="detail-main-image">
                                 {property.photos && property.photos.length > 0 ? (
-                                    <img src={property.photos[0]} alt={title} style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)' }} />
+                                    <img
+                                        src={property.photos[0]}
+                                        alt={title}
+                                        style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)', cursor: 'pointer' }}
+                                        onClick={() => { setLightboxIndex(0); setLightboxOpen(true); }}
+                                    />
                                 ) : (
                                     <div className="property-image-placeholder" style={{ height: '400px', fontSize: '6rem' }}>
                                         {property.bedrooms >= 4 ? '🏡' : property.area_sqm > 150 ? '🏢' : '🏠'}
@@ -89,7 +97,56 @@ export default function PropertyDetailClient({ id }: { id: string }) {
                                         <div className="score-label">Score</div>
                                     </div>
                                 )}
+                                {property.photos && property.photos.length > 1 && (
+                                    <div style={{
+                                        position: 'absolute', bottom: '12px', right: '12px',
+                                        background: 'rgba(0,0,0,0.7)', color: 'white',
+                                        padding: '6px 12px', borderRadius: '8px', fontSize: '0.8rem',
+                                        fontWeight: 600, cursor: 'pointer', backdropFilter: 'blur(4px)',
+                                    }} onClick={() => { setLightboxIndex(0); setLightboxOpen(true); }}>
+                                        📷 {property.photos.length} {locale === 'tr' ? 'fotoğraf' : 'photos'}
+                                    </div>
+                                )}
                             </div>
+
+                            {/* Secondary photo thumbnails */}
+                            {property.photos && property.photos.length > 1 && (
+                                <div style={{
+                                    display: 'flex', gap: '8px', marginTop: '8px',
+                                    overflowX: 'auto', paddingBottom: '4px',
+                                }}>
+                                    {property.photos.slice(1, 5).map((photo: string, i: number) => (
+                                        <img
+                                            key={i}
+                                            src={photo}
+                                            alt={`${title} - ${i + 2}`}
+                                            onClick={() => { setLightboxIndex(i + 1); setLightboxOpen(true); }}
+                                            style={{
+                                                width: '100px', height: '70px', objectFit: 'cover',
+                                                borderRadius: '8px', cursor: 'pointer', flexShrink: 0,
+                                                border: '2px solid var(--border)',
+                                                transition: 'border-color 0.2s',
+                                            }}
+                                            onMouseOver={e => (e.currentTarget.style.borderColor = 'var(--primary)')}
+                                            onMouseOut={e => (e.currentTarget.style.borderColor = 'var(--border)')}
+                                        />
+                                    ))}
+                                    {property.photos.length > 5 && (
+                                        <div
+                                            onClick={() => { setLightboxIndex(5); setLightboxOpen(true); }}
+                                            style={{
+                                                width: '100px', height: '70px', borderRadius: '8px',
+                                                background: 'rgba(27,107,147,0.1)', border: '2px solid var(--border)',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600,
+                                                color: 'var(--primary)', flexShrink: 0,
+                                            }}
+                                        >
+                                            +{property.photos.length - 5}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
                             {/* Quick Info Bar */}
                             <div style={{
@@ -273,6 +330,15 @@ export default function PropertyDetailClient({ id }: { id: string }) {
             </main>
 
             <ChatbotWidget locale={locale} />
+
+            {/* Photo Lightbox */}
+            {lightboxOpen && property?.photos && (
+                <PhotoLightbox
+                    photos={property.photos}
+                    initialIndex={lightboxIndex}
+                    onClose={() => setLightboxOpen(false)}
+                />
+            )}
         </div>
     );
 }

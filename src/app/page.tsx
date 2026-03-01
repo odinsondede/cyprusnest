@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { type Locale, locales, localeFlags, t } from '@/i18n/translations';
 import ChatbotWidget from '@/components/ChatbotWidget';
+import CookieConsent from '@/components/CookieConsent';
 import Navbar from '@/components/Navbar';
 
 export default function Home() {
@@ -272,8 +273,9 @@ export default function Home() {
             <div className="footer-col">
               <h4>{t(locale, 'footer.legal')}</h4>
               <ul>
-                <li><a href="/legal">{t(locale, 'footer.privacy')}</a></li>
-                <li><a href="/legal">{t(locale, 'footer.terms')}</a></li>
+                <li><a href="/legal/privacy">{t(locale, 'footer.privacy')}</a></li>
+                <li><a href="/legal/terms">{t(locale, 'footer.terms')}</a></li>
+                <li><a href="/legal">{locale === 'tr' ? 'Hukuki Rehber' : 'Legal Guide'}</a></li>
               </ul>
             </div>
           </div>
@@ -304,6 +306,7 @@ export default function Home() {
 
       {/* AI Chatbot */}
       <ChatbotWidget locale={locale} />
+      <CookieConsent locale={locale} />
     </div>
   );
 }
