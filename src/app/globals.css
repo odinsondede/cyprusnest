@@ -901,3 +901,65 @@ img {
 [dir="rtl"] .section-header {
   text-align: center;
 }
+
+/* ============ Mobile Hamburger Menu ============ */
+.hamburger-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  z-index: 1001;
+}
+
+@media (max-width: 768px) {
+  .hamburger-btn {
+    display: flex;
+    align-items: center;
+  }
+
+  .navbar-links {
+    display: none;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    right: 0;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    flex-direction: column;
+    padding: 16px 20px;
+    gap: 4px;
+    box-shadow: var(--shadow-lg);
+    z-index: 999;
+  }
+
+  .navbar-links.nav-open {
+    display: flex;
+  }
+
+  .navbar-links li a {
+    padding: 12px 16px;
+    display: block;
+    border-radius: var(--radius-md);
+    transition: background 0.15s;
+  }
+
+  .navbar-links li a:hover {
+    background: var(--bg-card);
+  }
+
+  .navbar .container {
+    position: relative;
+  }
+
+  .navbar-right {
+    gap: 8px;
+  }
+
+  .navbar-right .lang-selector {
+    font-size: 0.8rem;
+    padding: 4px 6px;
+  }
+}

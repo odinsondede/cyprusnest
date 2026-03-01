@@ -80,9 +80,13 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                         {/* Left — Visual */}
                         <div className="detail-visual">
                             <div className="detail-main-image">
-                                <div className="property-image-placeholder" style={{ height: '400px', fontSize: '6rem' }}>
-                                    {property.bedrooms >= 4 ? '🏡' : property.area_sqm > 150 ? '🏢' : '🏠'}
-                                </div>
+                                {property.photos && property.photos.length > 0 ? (
+                                    <img src={property.photos[0]} alt={title} style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: 'var(--radius-lg)' }} />
+                                ) : (
+                                    <div className="property-image-placeholder" style={{ height: '400px', fontSize: '6rem' }}>
+                                        {property.bedrooms >= 4 ? '🏡' : property.area_sqm > 150 ? '🏢' : '🏠'}
+                                    </div>
+                                )}
                                 <div className="property-badges" style={{ top: '16px', left: '16px' }}>
                                     <span className={`badge badge-${property.type}`}>
                                         {isRent ? (locale === 'tr' ? 'Kiralık' : 'Rent') : (locale === 'tr' ? 'Satılık' : 'Sale')}
@@ -157,8 +161,75 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                                         <span key={f} className="feature-tag">{f}</span>
                                     ))}
                                     {property.furnished && <span className="feature-tag" style={{ background: 'rgba(16,185,129,0.1)', color: '#10b981' }}>✅ {locale === 'tr' ? 'Eşyalı' : 'Furnished'}</span>}
+                                    {property.parking && <span className="feature-tag">🅿️ {locale === 'tr' ? 'Otopark' : 'Parking'}</span>}
+                                    {property.pool && <span className="feature-tag">🏊 {locale === 'tr' ? 'Havuz' : 'Pool'}</span>}
+                                    {property.sea_view && <span className="feature-tag" style={{ background: 'rgba(14,165,233,0.1)', color: '#0ea5e9' }}>🌊 {locale === 'tr' ? 'Deniz Manzarası' : 'Sea View'}</span>}
                                 </div>
                             </div>
+
+                            {/* KKTC Rental Details */}
+                            {isRent && (property.deposit_amount || property.contract_type || property.monthly_fees !== undefined) && (
+                                <div className="detail-section">
+                                    <h3>🔑 {locale === 'tr' ? 'Kiralama Detayları' : 'Rental Details'}</h3>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px' }}>
+                                        {property.deposit_amount > 0 && (
+                                            <div style={{ background: 'var(--bg-darker)', padding: '14px', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+                                                <div style={{ fontSize: '1.3rem' }}>💰</div>
+                                                <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1rem' }}>{property.deposit_amount} {locale === 'tr' ? 'kira' : 'month(s)'}</div>
+                                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{locale === 'tr' ? 'Depozito' : 'Deposit'}</div>
+                                            </div>
+                                        )}
+                                        {property.contract_type && (
+                                            <div style={{ background: 'var(--bg-darker)', padding: '14px', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+                                                <div style={{ fontSize: '1.3rem' }}>📝</div>
+                                                <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1rem' }}>
+                                                    {{ monthly: locale === 'tr' ? 'Aylık' : 'Monthly', sixmonth: locale === 'tr' ? '6 Ay' : '6 Months', yearly: locale === 'tr' ? 'Yıllık' : 'Yearly', flexible: locale === 'tr' ? 'Esnek' : 'Flexible' }[property.contract_type] || property.contract_type}
+                                                </div>
+                                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{locale === 'tr' ? 'Sözleşme' : 'Contract'}</div>
+                                            </div>
+                                        )}
+                                        {property.monthly_fees > 0 && (
+                                            <div style={{ background: 'var(--bg-darker)', padding: '14px', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+                                                <div style={{ fontSize: '1.3rem' }}>💷</div>
+                                                <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1rem' }}>£{property.monthly_fees}</div>
+                                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{locale === 'tr' ? 'Aylık Aidat' : 'Monthly Fees'}</div>
+                                            </div>
+                                        )}
+                                        <div style={{ background: 'var(--bg-darker)', padding: '14px', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+                                            <div style={{ fontSize: '1.3rem' }}>{property.bills_included ? '✅' : '❌'}</div>
+                                            <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1rem' }}>{property.bills_included ? (locale === 'tr' ? 'Dahil' : 'Included') : (locale === 'tr' ? 'Dahil değil' : 'Not incl.')}</div>
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{locale === 'tr' ? 'Faturalar' : 'Bills'}</div>
+                                        </div>
+                                        <div style={{ background: 'var(--bg-darker)', padding: '14px', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+                                            <div style={{ fontSize: '1.3rem' }}>{property.available_now ? '🟢' : '🟡'}</div>
+                                            <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1rem' }}>{property.available_now ? (locale === 'tr' ? 'Evet' : 'Yes') : (locale === 'tr' ? 'Hayır' : 'No')}</div>
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{locale === 'tr' ? 'Hemen Müsait' : 'Available Now'}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Title Deed for sale */}
+                            {!isRent && property.title_deed_type && (
+                                <div className="detail-section">
+                                    <h3>📜 {locale === 'tr' ? 'Tapu Bilgisi' : 'Title Deed'}</h3>
+                                    <span className="feature-tag" style={{ padding: '8px 16px', fontSize: '0.9rem' }}>
+                                        {{ turkish: locale === 'tr' ? 'Türk Koçanı' : 'Turkish Title', equivalent: locale === 'tr' ? 'Eşdeğer Koçan' : 'Equivalent Title', allocation: locale === 'tr' ? 'Tahsis' : 'Allocation', foreign: locale === 'tr' ? 'Yabancı Koçan' : 'Foreign Title', unknown: locale === 'tr' ? 'Bilinmiyor' : 'Unknown' }[property.title_deed_type] || property.title_deed_type}
+                                    </span>
+                                </div>
+                            )}
+
+                            {/* Nearby Landmarks */}
+                            {property.nearby_landmarks && property.nearby_landmarks.length > 0 && (
+                                <div className="detail-section">
+                                    <h3>📍 {locale === 'tr' ? 'Yakın Noktalar' : 'Nearby'}</h3>
+                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                        {property.nearby_landmarks.map((l: string, i: number) => (
+                                            <span key={i} className="feature-tag">📌 {l}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                             {/* CTA Actions */}
                             <div className="detail-actions">

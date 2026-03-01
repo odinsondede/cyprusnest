@@ -125,6 +125,7 @@ export default function PropertiesPage() {
     const [showAuth, setShowAuth] = useState(false);
     const [user, setUser] = useState<{ id: string } | null>(null);
     const [favIds, setFavIds] = useState<string[]>([]);
+    const [menuOpen, setMenuOpen] = useState(false);
     const [quickFilters, setQuickFilters] = useState({
         available_now: false, bills_included: false, furnished: false,
         parking: false, pool: false, sea_view: false,
@@ -200,11 +201,14 @@ export default function PropertiesPage() {
                         <span className="logo-icon">🏠</span>
                         <span className="logo-text">CyprusNest</span>
                     </a>
-                    <ul className="navbar-links">
-                        <li><a href="/properties" style={{ color: 'var(--primary-light)' }}>{t(locale, 'nav.rent')}</a></li>
-                        <li><a href="/properties">{t(locale, 'nav.buy')}</a></li>
-                        <li><a href="/legal">{t(locale, 'nav.legal')}</a></li>
-                        <li><a href="/blog">Blog</a></li>
+                    <button className="hamburger-btn" onClick={() => setMenuOpen(!menuOpen)}>
+                        {menuOpen ? '✕' : '☰'}
+                    </button>
+                    <ul className={`navbar-links ${menuOpen ? 'nav-open' : ''}`}>
+                        <li><a href="/properties" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary-light)' }}>{t(locale, 'nav.rent')}</a></li>
+                        <li><a href="/properties" onClick={() => setMenuOpen(false)}>{t(locale, 'nav.buy')}</a></li>
+                        <li><a href="/legal" onClick={() => setMenuOpen(false)}>{t(locale, 'nav.legal')}</a></li>
+                        <li><a href="/blog" onClick={() => setMenuOpen(false)}>Blog</a></li>
                     </ul>
                     <div className="navbar-right">
                         <select className="lang-selector" value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
