@@ -1,15 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { type Locale } from '@/i18n/translations';
 import { getCurrentUser, onAuthChange } from '@/lib/auth';
 import { supabase, type Property } from '@/lib/supabase';
 import ChatbotWidget from '@/components/ChatbotWidget';
+import Navbar from '@/components/Navbar';
 import '../properties/properties.css';
 
 // Admin emails — only these can access the panel
 const ADMIN_EMAILS = ['admin@cyprusnest.com'];
 
 export default function AdminPage() {
+    const [locale, setLocale] = useState<Locale>('tr');
     const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
     const [pending, setPending] = useState<Property[]>([]);
     const [loading, setLoading] = useState(true);
@@ -72,17 +75,7 @@ export default function AdminPage() {
 
     return (
         <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
-            <nav className="navbar">
-                <div className="container">
-                    <a href="/" className="navbar-logo">
-                        <span className="logo-icon">🏠</span>
-                        <span className="logo-text">Admin Panel</span>
-                    </a>
-                    <div className="navbar-right">
-                        <a href="/properties" className="btn btn-outline btn-sm">← İlanlar</a>
-                    </div>
-                </div>
-            </nav>
+            <Navbar locale={locale} onLocaleChange={setLocale} activePage="admin" />
 
             <main className="container" style={{ paddingTop: '100px', paddingBottom: '40px' }}>
                 <div style={{ maxWidth: '900px', margin: '0 auto' }}>

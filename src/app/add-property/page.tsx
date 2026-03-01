@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { type Locale, localeNames, localeFlags, locales, t } from '@/i18n/translations';
+import { type Locale, t } from '@/i18n/translations';
 import { getCurrentUser, onAuthChange } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import { uploadPropertyPhoto } from '@/lib/storage';
 import AuthModal from '@/components/AuthModal';
+import Navbar from '@/components/Navbar';
 import ChatbotWidget from '@/components/ChatbotWidget';
 import '../properties/properties.css';
 
@@ -138,25 +139,7 @@ export default function AddPropertyPage() {
 
     return (
         <div>
-            <nav className="navbar">
-                <div className="container">
-                    <a href="/" className="navbar-logo">
-                        <span className="logo-icon">🏠</span>
-                        <span className="logo-text">CyprusNest</span>
-                    </a>
-                    <ul className="navbar-links">
-                        <li><a href="/properties">{t(locale, 'nav.rent')}</a></li>
-                        <li><a href="/properties">{t(locale, 'nav.buy')}</a></li>
-                        <li><a href="/legal">{t(locale, 'nav.legal')}</a></li>
-                        <li><a href="/blog">Blog</a></li>
-                    </ul>
-                    <div className="navbar-right">
-                        <select className="lang-selector" value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
-                            {locales.map((l) => (<option key={l} value={l}>{localeFlags[l]} {localeNames[l]}</option>))}
-                        </select>
-                    </div>
-                </div>
-            </nav>
+            <Navbar locale={locale} onLocaleChange={setLocale} activePage="add-property" />
 
             <main style={{ paddingTop: '100px', paddingBottom: '64px', minHeight: '100vh' }}>
                 <div className="container" style={{ maxWidth: '700px' }}>

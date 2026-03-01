@@ -1,10 +1,11 @@
 'use client';
 
 import { use, useState, useEffect } from 'react';
-import { type Locale, localeNames, localeFlags, locales, t } from '@/i18n/translations';
+import { type Locale, t } from '@/i18n/translations';
 import { getPropertyById, formatPrice, getScoreColor } from '@/lib/properties';
 import { type Property } from '@/lib/supabase';
 import ChatbotWidget from '@/components/ChatbotWidget';
+import Navbar from '@/components/Navbar';
 import '../detail.css';
 import '../properties.css';
 
@@ -49,25 +50,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
 
     return (
         <div>
-            <nav className="navbar">
-                <div className="container">
-                    <a href="/" className="navbar-logo">
-                        <span className="logo-icon">🏠</span>
-                        <span className="logo-text">CyprusNest</span>
-                    </a>
-                    <ul className="navbar-links">
-                        <li><a href="/properties">{t(locale, 'nav.rent')}</a></li>
-                        <li><a href="/properties">{t(locale, 'nav.buy')}</a></li>
-                        <li><a href="/legal">{t(locale, 'nav.legal')}</a></li>
-                        <li><a href="/blog">Blog</a></li>
-                    </ul>
-                    <div className="navbar-right">
-                        <select className="lang-selector" value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
-                            {locales.map((l) => (<option key={l} value={l}>{localeFlags[l]} {localeNames[l]}</option>))}
-                        </select>
-                    </div>
-                </div>
-            </nav>
+            <Navbar locale={locale} onLocaleChange={setLocale} activePage="properties" />
 
             <main className="detail-page">
                 <div className="container">

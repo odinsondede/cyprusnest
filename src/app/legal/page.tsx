@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { type Locale, localeNames, localeFlags, locales, t } from '@/i18n/translations';
+import { type Locale, t } from '@/i18n/translations';
 import ChatbotWidget from '@/components/ChatbotWidget';
+import Navbar from '@/components/Navbar';
 import '../properties/detail.css';
 import '../properties/properties.css';
 
@@ -119,25 +120,7 @@ export default function LegalWizardPage() {
 
     return (
         <div dir={dir}>
-            <nav className="navbar">
-                <div className="container">
-                    <a href="/" className="navbar-logo">
-                        <span className="logo-icon">🏠</span>
-                        <span className="logo-text">CyprusNest</span>
-                    </a>
-                    <ul className="navbar-links">
-                        <li><a href="/properties">{t(locale, 'nav.rent')}</a></li>
-                        <li><a href="/properties">{t(locale, 'nav.buy')}</a></li>
-                        <li><a href="/legal" style={{ color: 'var(--primary-light)' }}>{t(locale, 'nav.legal')}</a></li>
-                    </ul>
-                    <div className="navbar-right">
-                        <select className="lang-selector" value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
-                            {locales.map((l) => (<option key={l} value={l}>{localeFlags[l]} {localeNames[l]}</option>))}
-                        </select>
-                        <button className="btn btn-primary">{t(locale, 'nav.register')}</button>
-                    </div>
-                </div>
-            </nav>
+            <Navbar locale={locale} onLocaleChange={setLocale} activePage="legal" />
 
             <main className="legal-page">
                 <div className="container">
