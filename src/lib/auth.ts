@@ -25,7 +25,7 @@ export async function signInWithGoogle() {
     const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: `${window.location.origin}/properties`,
+            redirectTo: `${window.location.origin}/auth/callback`,
         },
     });
     if (error) return { error: error.message };
@@ -36,7 +36,7 @@ export async function signInWithFacebook() {
     const { error } = await supabase.auth.signInWithOAuth({
         provider: 'facebook',
         options: {
-            redirectTo: `${window.location.origin}/properties`,
+            redirectTo: `${window.location.origin}/auth/callback`,
         },
     });
     if (error) return { error: error.message };
@@ -45,7 +45,7 @@ export async function signInWithFacebook() {
 
 export async function resetPassword(email: string) {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/properties`,
+        redirectTo: `${window.location.origin}/auth/callback`,
     });
     if (error) return { error: error.message };
     return { error: null };
