@@ -36,7 +36,7 @@ function AddPropertyContent() {
         district: '',
         bedrooms: '1', bathrooms: '1', area_sqm: '',
         furnished: false,
-        features: '',
+        features: [] as string[],
         // KKTC fields
         deposit_amount: '1',
         contract_type: 'yearly' as 'monthly' | 'sixmonth' | 'yearly' | 'flexible',
@@ -44,7 +44,7 @@ function AddPropertyContent() {
         bills_included: false,
         available_now: true,
         monthly_fees: '0',
-        nearby_landmarks: '',
+        nearby_landmarks: [] as string[],
         parking: false,
         pool: false,
         sea_view: false,
@@ -74,14 +74,14 @@ function AddPropertyContent() {
                 bedrooms: String(data.bedrooms || '1'), bathrooms: String(data.bathrooms || '1'),
                 area_sqm: String(data.area_sqm || ''),
                 furnished: data.furnished || false,
-                features: (data.features || []).join(', '),
+                features: data.features || [],
                 deposit_amount: String(data.deposit_amount || '1'),
                 contract_type: data.contract_type || 'yearly',
                 title_deed_type: data.title_deed_type || 'turkish',
                 bills_included: data.bills_included || false,
                 available_now: data.available_now ?? true,
                 monthly_fees: String(data.monthly_fees || '0'),
-                nearby_landmarks: (data.nearby_landmarks || []).join(', '),
+                nearby_landmarks: data.nearby_landmarks || [],
                 parking: data.parking || false,
                 pool: data.pool || false,
                 sea_view: data.sea_view || false,
@@ -92,7 +92,7 @@ function AddPropertyContent() {
         }
     }
 
-    function updateForm(field: string, value: string | boolean) {
+    function updateForm(field: string, value: string | boolean | string[]) {
         setForm(prev => ({ ...prev, [field]: value }));
     }
 
@@ -102,15 +102,8 @@ function AddPropertyContent() {
         setLoading(true);
         setError('');
 
-        const featuresArr = form.features
-            .split(',')
-            .map(f => f.trim())
-            .filter(f => f.length > 0);
-
-        const landmarksArr = form.nearby_landmarks
-            .split(',')
-            .map(l => l.trim())
-            .filter(l => l.length > 0);
+        const featuresArr = form.features;
+        const landmarksArr = form.nearby_landmarks;
 
         // Upload photos
         const photoUrls: string[] = [];
@@ -220,11 +213,11 @@ function AddPropertyContent() {
                                 {isTR ? 'İlanınız Gönderildi!' : 'Listing Submitted!'}
                             </h2>
                             <p style={{ color: 'var(--text-muted)', marginBottom: '20px' }}>
-                                {isTR ? 'İncelendikten sonra yayınlanacaktır.' : 'It will be published after review.'}
+                                {isTR ? 'İlanınız yayınlandı!' : 'Your listing is now live!'}
                             </p>
                             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
                                 <a href="/properties" className="btn btn-primary">{isTR ? 'İlanları Gör' : 'View Listings'}</a>
-                                <button className="btn btn-outline" onClick={() => { setSuccess(false); setForm({ title_tr: '', title_en: '', description_tr: '', description_en: '', type: 'rent', price: '', city: 'Lefkoşa', district: '', bedrooms: '1', bathrooms: '1', area_sqm: '', furnished: false, features: '', deposit_amount: '1', contract_type: 'yearly', title_deed_type: 'turkish', bills_included: false, available_now: true, monthly_fees: '0', nearby_landmarks: '', parking: false, pool: false, sea_view: false }); }}>
+                                <button className="btn btn-outline" onClick={() => { setSuccess(false); setForm({ title_tr: '', title_en: '', description_tr: '', description_en: '', type: 'rent', price: '', city: 'Lefkoşa', district: '', bedrooms: '1', bathrooms: '1', area_sqm: '', furnished: false, features: [], deposit_amount: '1', contract_type: 'yearly', title_deed_type: 'turkish', bills_included: false, available_now: true, monthly_fees: '0', nearby_landmarks: [], parking: false, pool: false, sea_view: false }); }}>
                                     {isTR ? 'Yeni İlan Ekle' : 'Add Another'}
                                 </button>
                             </div>
@@ -313,16 +306,48 @@ function AddPropertyContent() {
                                     placeholder={isTR ? 'Mülk hakkında detaylar...' : 'Property details in Turkish...'} style={{ ...inputStyle, resize: 'vertical' as const }} />
                             </div>
 
-                            {/* Features */}
+                            {/* Features - Selectable Tags */}
                             <div>
-                                <label style={labelStyle}>{isTR ? 'Özellikler (virgülle ayır)' : 'Features (comma separated)'}</label>
-                                <input type="text" value={form.features} onChange={e => updateForm('features', e.target.value)}
-                                    placeholder="Klima, Otopark, Havuz, Wi-Fi" style={inputStyle} />
+                                <label style={labelStyle}>✨ {isTR ? 'Özellikler' : 'Features'}</label>
+                                {[
+                                    { label: isTR ? '🏠 Genel' : '🏠 General', items: ['Klima', 'Wi-Fi', 'Eşyalı', 'Güvenlik/Kamera', 'Asansör', 'Jeneratör', 'Güneş Paneli'] },
+                                    { label: isTR ? '🍳 Mutfak' : '🍳 Kitchen', items: ['Bulaşık Makinesi', 'Çamaşır Makinesi', 'Kurutma Makinesi', 'Fırın/Ocak', 'Buzdolabı'] },
+                                    { label: isTR ? '🌿 Dış Alan' : '🌿 Outdoor', items: ['Bahçe', 'Teras/Balkon', 'Barbekü', 'Havuz', 'Otopark', 'Garaj'] },
+                                    { label: isTR ? '📍 Konum' : '📍 Location', items: ['Deniz Manzarası', 'Dağ Manzarası', 'Merkeze Yakın', 'Üniversiteye Yakın', 'Sahile Yakın'] },
+                                ].map(group => (
+                                    <div key={group.label} style={{ marginBottom: '12px' }}>
+                                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>{group.label}</span>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                            {group.items.map(item => {
+                                                const selected = form.features.includes(item);
+                                                return (
+                                                    <button key={item} type="button" onClick={() => {
+                                                        setForm(prev => ({
+                                                            ...prev,
+                                                            features: selected
+                                                                ? prev.features.filter(f => f !== item)
+                                                                : [...prev.features, item],
+                                                        }));
+                                                    }} style={{
+                                                        padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem',
+                                                        border: selected ? '1.5px solid var(--primary)' : '1.5px solid var(--border)',
+                                                        background: selected ? 'rgba(14,165,233,0.15)' : 'var(--bg-darker)',
+                                                        color: selected ? 'var(--primary-light)' : 'var(--text-muted)',
+                                                        cursor: 'pointer', transition: 'all 0.15s',
+                                                        fontWeight: selected ? 600 : 400,
+                                                    }}>
+                                                        {selected ? '✓ ' : ''}{item}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
 
                             {/* Photo Upload */}
                             <div>
-                                <label style={labelStyle}>📷 {isTR ? 'Fotoğraflar (max 10)' : 'Photos (max 10)'}</label>
+                                <label style={labelStyle}>📷 {isTR ? 'Fotoğraflar (max 20)' : 'Photos (max 20)'}</label>
                                 <div
                                     onClick={() => fileInputRef.current?.click()}
                                     style={{
@@ -336,7 +361,7 @@ function AddPropertyContent() {
                                         {isTR ? 'Tıklayın veya fotoğraf sürükleyin' : 'Click or drag photos here'}
                                     </p>
                                     <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '4px' }}>
-                                        JPG, PNG, WebP — max 5MB
+                                        JPG, PNG, WebP — max 10MB
                                     </p>
                                 </div>
                                 <input
@@ -346,17 +371,17 @@ function AddPropertyContent() {
                                     multiple
                                     style={{ display: 'none' }}
                                     onChange={(e) => {
-                                        const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+                                        const MAX_SIZE = 10 * 1024 * 1024; // 10MB
                                         const allFiles = Array.from(e.target.files || []);
                                         const validFiles = allFiles.filter(f => f.size <= MAX_SIZE);
                                         if (validFiles.length < allFiles.length) {
-                                            alert(isTR ? `${allFiles.length - validFiles.length} dosya 5MB limitini aşıyor ve eklenmedi.` : `${allFiles.length - validFiles.length} file(s) exceed 5MB limit and were skipped.`);
+                                            alert(isTR ? `${allFiles.length - validFiles.length} dosya 10MB limitini aşıyor ve eklenmedi.` : `${allFiles.length - validFiles.length} file(s) exceed 10MB limit and were skipped.`);
                                         }
-                                        const files = validFiles.slice(0, 10 - photos.length);
+                                        const files = validFiles.slice(0, 20 - photos.length);
                                         if (files.length === 0) return;
-                                        setPhotos(prev => [...prev, ...files].slice(0, 10));
+                                        setPhotos(prev => [...prev, ...files].slice(0, 20));
                                         const newPreviews = files.map(f => URL.createObjectURL(f));
-                                        setPhotoPreviews(prev => [...prev, ...newPreviews].slice(0, 10));
+                                        setPhotoPreviews(prev => [...prev, ...newPreviews].slice(0, 20));
                                         e.target.value = '';
                                     }}
                                 />
@@ -454,11 +479,37 @@ function AddPropertyContent() {
                                 </label>
                             </div>
 
-                            {/* Nearby */}
+                            {/* Nearby - Selectable Tags */}
                             <div>
-                                <label style={labelStyle}>{isTR ? 'Yakın Noktalar (virgülle ayır)' : 'Nearby Landmarks (comma separated)'}</label>
-                                <input type="text" value={form.nearby_landmarks} onChange={e => updateForm('nearby_landmarks', e.target.value)}
-                                    placeholder={isTR ? 'YDÜ 5dk, Market 2dk, Hastane 10dk' : 'NEU 5min, Market 2min, Hospital 10min'} style={inputStyle} />
+                                <label style={labelStyle}>📍 {isTR ? 'Yakın Noktalar' : 'Nearby Landmarks'}</label>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                    {[
+                                        'Üniversite', 'Market/Süpermarket', 'Hastane', 'Eczane', 'Okul',
+                                        'Otobüs Durağı', 'Cami', 'Park', 'Sahil/Plaj', 'Restoran',
+                                        'AVM/Alışveriş', 'Banka/ATM', 'Benzin İstasyonu', 'Spor Salonu',
+                                    ].map(item => {
+                                        const selected = form.nearby_landmarks.includes(item);
+                                        return (
+                                            <button key={item} type="button" onClick={() => {
+                                                setForm(prev => ({
+                                                    ...prev,
+                                                    nearby_landmarks: selected
+                                                        ? prev.nearby_landmarks.filter(l => l !== item)
+                                                        : [...prev.nearby_landmarks, item],
+                                                }));
+                                            }} style={{
+                                                padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem',
+                                                border: selected ? '1.5px solid var(--primary)' : '1.5px solid var(--border)',
+                                                background: selected ? 'rgba(14,165,233,0.15)' : 'var(--bg-darker)',
+                                                color: selected ? 'var(--primary-light)' : 'var(--text-muted)',
+                                                cursor: 'pointer', transition: 'all 0.15s',
+                                                fontWeight: selected ? 600 : 400,
+                                            }}>
+                                                {selected ? '✓ ' : ''}{item}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             </div>
 
                             {error && (
