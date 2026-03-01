@@ -30,7 +30,7 @@ export default function Navbar({ locale, onLocaleChange, activePage }: NavbarPro
                 <div className="container">
                     <a href="/" className="navbar-logo">
                         <span className="logo-icon">🏠</span>
-                        <span className="logo-text">CyprusNest</span>
+                        <span className="logo-text">Evlek</span>
                     </a>
                     <button className="hamburger-btn" onClick={() => setMenuOpen(!menuOpen)}>
                         {menuOpen ? '✕' : '☰'}

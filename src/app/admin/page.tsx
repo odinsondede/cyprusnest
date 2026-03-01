@@ -9,7 +9,7 @@ import Navbar from '@/components/Navbar';
 import '../properties/properties.css';
 
 // Admin emails — only these can access the panel
-const ADMIN_EMAILS = ['admin@cyprusnest.com'];
+const ADMIN_EMAILS = ['admin@evlek.app'];
 
 export default function AdminPage() {
     const [locale, setLocale] = useState<Locale>('tr');

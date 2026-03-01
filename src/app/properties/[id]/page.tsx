@@ -46,7 +46,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
     const title = locale === 'tr' ? property.title_tr : property.title_en;
     const desc = locale === 'tr' ? (property.description_tr || property.description_en) : (property.description_en || property.description_tr);
     const isRent = property.type === 'rent';
-    const whatsappNumber = '905338517878'; // Default CyprusNest number
+    const whatsappNumber = '905338517878'; // Default Evlek number
 
     return (
         <div>
@@ -56,7 +56,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                 <div className="container">
                     {/* Breadcrumb */}
                     <div className="breadcrumb">
-                        <a href="/">CyprusNest</a> / <a href="/properties">{locale === 'tr' ? 'İlanlar' : 'Properties'}</a> / {title}
+                        <a href="/">Evlek</a> / <a href="/properties">{locale === 'tr' ? 'İlanlar' : 'Properties'}</a> / {title}
                     </div>
 
                     <div className="detail-grid">
@@ -219,8 +219,8 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                                 <a
                                     href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
                                         locale === 'tr'
-                                            ? `Merhaba, CyprusNest'te gördüğüm "${title}" hakkında bilgi almak istiyorum.`
-                                            : `Hello, I'd like to inquire about "${title}" that I saw on CyprusNest.`
+                                            ? `Merhaba, Evlek'te gördüğüm "${title}" hakkında bilgi almak istiyorum.`
+                                            : `Hello, I'd like to inquire about "${title}" that I saw on Evlek.`
                                     )}`}
                                     target="_blank"
                                     rel="noopener noreferrer"

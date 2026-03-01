@@ -43,7 +43,7 @@ Gönyeli, Lefkoşa'nın batısında yer alan KKTC'nin en hızlı büyüyen ilçe
 
 ## Kiralama Süreci
 
-1. **İlan Bul** — 101evler.com, CyprusNest, Facebook grupları
+1. **İlan Bul** — 101evler.com, Evlek, Facebook grupları
 2. **Evi Gör** — fotoğrafa güvenme, mutlaka git bak
 3. **Depozito** — genellikle 1-2 aylık kira
 4. **Sözleşme** — minimum 6 ay, genelde 1 yıl
@@ -122,7 +122,7 @@ Gönyeli is one of the fastest-growing districts in the TRNC, located west of Ni
 
 ## Rental Process
 
-1. **Find a listing** — 101evler.com, CyprusNest, Facebook groups
+1. **Find a listing** — 101evler.com, Evlek, Facebook groups
 2. **Visit the property** — don't trust photos alone
 3. **Deposit** — usually 1-2 months rent
 4. **Contract** — minimum 6 months, usually 1 year

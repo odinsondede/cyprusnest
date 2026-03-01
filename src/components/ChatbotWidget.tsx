@@ -9,11 +9,11 @@ interface ChatMessage {
 }
 
 const WELCOME_MESSAGES: Record<string, string> = {
-    tr: 'Merhaba! 👋 Ben CyprusNest AI asistanınızım. KKTC\'de mülk aramanızda size yardımcı olabilirim. Bütçenizi, bölgenizi veya arzu ettiğiniz özellikleri söyleyin!',
-    en: 'Hello! 👋 I\'m your CyprusNest AI assistant. I can help you find properties in North Cyprus. Tell me your budget, preferred area, or desired features!',
-    ru: 'Привет! 👋 Я AI-ассистент CyprusNest. Помогу найти недвижимость на Северном Кипре. Расскажите о бюджете, районе или пожеланиях!',
-    de: 'Hallo! 👋 Ich bin Ihr CyprusNest KI-Assistent. Ich helfe Ihnen, Immobilien in Nordzypern zu finden!',
-    ar: 'مرحباً! 👋 أنا مساعد CyprusNest الذكي. يمكنني مساعدتك في العثور على عقارات في شمال قبرص!',
+    tr: 'Merhaba! 👋 Ben Evlek AI asistanınızım. KKTC\'de mülk aramanızda size yardımcı olabilirim. Bütçenizi, bölgenizi veya arzu ettiğiniz özellikleri söyleyin!',
+    en: 'Hello! 👋 I\'m your Evlek AI assistant. I can help you find properties in North Cyprus. Tell me your budget, preferred area, or desired features!',
+    ru: 'Привет! 👋 Я AI-ассистент Evlek. Помогу найти недвижимость на Северном Кипре. Расскажите о бюджете, районе или пожеланиях!',
+    de: 'Hallo! 👋 Ich bin Ihr Evlek KI-Assistent. Ich helfe Ihnen, Immobilien in Nordzypern zu finden!',
+    ar: 'مرحباً! 👋 أنا مساعد Evlek الذكي. يمكنني مساعدتك في العثور على عقارات في شمال قبرص!',
 };
 
 const PLACEHOLDER: Record<string, string> = {
@@ -118,7 +118,7 @@ export default function ChatbotWidget({ locale }: { locale: Locale }) {
             {isOpen && (
                 <div className="chatbot-panel">
                     <div className="chatbot-header">
-                        <h3>🤖 CyprusNest AI</h3>
+                        <h3>🤖 Evlek AI</h3>
                         <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
                     </div>
 

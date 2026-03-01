@@ -25,7 +25,7 @@ KKTC emlak piyasasında bazı mülkler günlerde satılırken bazıları aylarca
 - Bölgenizdeki benzer mülkleri araştırın
 - Aşırı yüksek fiyat → kimse bakmaz
 - Biraz altında fiyat → daha çok ilgi → rekabet → daha iyi teklif
-- CyprusNest'in fiyat analiz aracını kullanın (yakında)
+- Evlek'in fiyat analiz aracını kullanın (yakında)
 
 ## 3. Detaylı Açıklama Yazın
 
@@ -36,7 +36,7 @@ Kötü: "2+1 daire satılık"
 
 - KKTC'de alıcılar: Türk, İngiliz, Rus, Güney Kıbrıslı
 - Tek dilde ilan = pazarın %25'ine ulaşırsınız
-- CyprusNest 4 dilde otomatik çeviri sunacak (yakında)
+- Evlek 4 dilde otomatik çeviri sunacak (yakında)
 
 ## 5. WhatsApp'ı Etkin Kullanın
 
@@ -57,7 +57,7 @@ Kötü: "2+1 daire satılık"
 - Nisan-Haziran: Yaz öncesi → satılık artar
 - Ocak-Şubat: En yavaş dönem
 
-[👉 İlanınızı CyprusNest'te Yayınlayın](/properties)`,
+[👉 İlanınızı Evlek'te Yayınlayın](/properties)`,
 
     en: `# 7 Ways to Sell Your Property Faster — TRNC Real Estate Marketing Guide
 
@@ -78,7 +78,7 @@ In the TRNC real estate market, some properties sell in days while others wait f
 - Research similar properties in your area
 - Overpricing → nobody looks
 - Slightly below market → more interest → competition → better offers
-- Use CyprusNest's price analysis tool (coming soon)
+- Use Evlek's price analysis tool (coming soon)
 
 ## 3. Write Detailed Descriptions
 
@@ -89,7 +89,7 @@ Good: "2+1 apartment in Gönyeli center, 5-min walk to NEU, 2nd floor, south-fac
 
 - TRNC buyers: Turkish, British, Russian, Greek Cypriot
 - Single-language listing = reaching only 25% of the market
-- CyprusNest will offer automatic 4-language translation (coming soon)
+- Evlek will offer automatic 4-language translation (coming soon)
 
 ## 5. Use WhatsApp Effectively
 
@@ -110,7 +110,7 @@ Good: "2+1 apartment in Gönyeli center, 5-min walk to NEU, 2nd floor, south-fac
 - April-June: Pre-summer → sales increase
 - January-February: Slowest period
 
-[👉 List Your Property on CyprusNest](/properties)`,
+[👉 List Your Property on Evlek](/properties)`,
 };
 
 export default function SellFasterPage() {

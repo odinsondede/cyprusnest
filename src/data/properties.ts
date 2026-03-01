@@ -18,7 +18,7 @@ export interface Property {
     };
     features: string[];
     images: string[];
-    score: number; // CyprusNest Score 0-100
+    score: number; // Evlek Score 0-100
     agent: {
         name: string;
         company: string;

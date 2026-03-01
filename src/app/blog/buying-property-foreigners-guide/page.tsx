@@ -25,7 +25,7 @@ Evet! Yabancı uyruklu kişiler Kuzey Kıbrıs'ta mülk satın alabilir. Ancak 2
 ## Adım Adım Satın Alma Süreci
 
 ### 1. Mülk Seçimi
-- İlanları inceleyin (CyprusNest, 101evler)
+- İlanları inceleyin (Evlek, 101evler)
 - WhatsApp ile emlakçıyla iletişim kurun
 - Mülkü mutlaka yerinde görün
 - Tapu türünü sorun (Eşdeğer Koçan en güvenli)
@@ -127,7 +127,7 @@ Yes! Foreign nationals can purchase property in the TRNC. However, regulations t
 ## Step-by-Step Purchase Process
 
 ### 1. Property Selection
-- Browse listings (CyprusNest, 101evler)
+- Browse listings (Evlek, 101evler)
 - Contact agents via WhatsApp
 - Always visit the property in person
 - Ask about title deed type (Turkish Title is safest)

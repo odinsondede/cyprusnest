@@ -163,7 +163,7 @@ export default function Home() {
             <div className="footer-brand">
               <div className="navbar-logo" style={{ marginBottom: '4px' }}>
                 <span className="logo-icon">🏠</span>
-                <span className="logo-text">CyprusNest</span>
+                <span className="logo-text">Evlek</span>
               </div>
               <p>{t(locale, 'footer.desc')}</p>
             </div>
@@ -196,7 +196,7 @@ export default function Home() {
           </div>
 
           <div className="footer-bottom">
-            <span>© 2026 CyprusNest. {t(locale, 'footer.rights')}</span>
+            <span>© 2026 Evlek. {t(locale, 'footer.rights')}</span>
             <div style={{ display: 'flex', gap: '8px' }}>
               {locales.map((l) => (
                 <button
