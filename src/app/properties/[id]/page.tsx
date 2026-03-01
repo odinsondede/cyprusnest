@@ -151,10 +151,10 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                                     {(property.features || []).map((f: string) => (
                                         <span key={f} className="feature-tag">{f}</span>
                                     ))}
-                                    {property.furnished && <span className="feature-tag" style={{ background: 'rgba(16,185,129,0.1)', color: '#10b981' }}>✅ {locale === 'tr' ? 'Eşyalı' : 'Furnished'}</span>}
-                                    {property.parking && <span className="feature-tag">🅿️ {locale === 'tr' ? 'Otopark' : 'Parking'}</span>}
-                                    {property.pool && <span className="feature-tag">🏊 {locale === 'tr' ? 'Havuz' : 'Pool'}</span>}
-                                    {property.sea_view && <span className="feature-tag" style={{ background: 'rgba(14,165,233,0.1)', color: '#0ea5e9' }}>🌊 {locale === 'tr' ? 'Deniz Manzarası' : 'Sea View'}</span>}
+                                    {property.furnished && !(property.features || []).includes('Eşyalı') && <span className="feature-tag" style={{ background: 'rgba(16,185,129,0.1)', color: '#10b981' }}>✅ {locale === 'tr' ? 'Eşyalı' : 'Furnished'}</span>}
+                                    {property.parking && !(property.features || []).includes('Otopark') && <span className="feature-tag">🅿️ {locale === 'tr' ? 'Otopark' : 'Parking'}</span>}
+                                    {property.pool && !(property.features || []).includes('Havuz') && <span className="feature-tag">🏊 {locale === 'tr' ? 'Havuz' : 'Pool'}</span>}
+                                    {property.sea_view && !(property.features || []).includes('Deniz Manzarası') && <span className="feature-tag" style={{ background: 'rgba(14,165,233,0.1)', color: '#0ea5e9' }}>🌊 {locale === 'tr' ? 'Deniz Manzarası' : 'Sea View'}</span>}
                                 </div>
                             </div>
 

@@ -122,7 +122,6 @@ function AddPropertyContent() {
         whatsapp: '',
         phone: '',
         telegram: '',
-        video_url: '',
         property_condition: 'secondhand' as string,
     };
 
@@ -172,7 +171,6 @@ function AddPropertyContent() {
                 whatsapp: data.whatsapp || '',
                 phone: data.phone || '',
                 telegram: data.telegram || '',
-                video_url: data.video_url || '',
                 property_condition: data.property_condition || 'secondhand',
             });
             if (data.photos && data.photos.length > 0) {
@@ -263,7 +261,6 @@ function AddPropertyContent() {
             whatsapp: form.whatsapp || null,
             phone: form.phone || null,
             telegram: form.telegram || null,
-            video_url: form.video_url || null,
             property_condition: form.property_condition,
         };
 
@@ -623,11 +620,6 @@ function AddPropertyContent() {
                                 )}
                             </div>
 
-                            {/* Video URL (optional) */}
-                            <div>
-                                <label style={labelStyle}>🎥 {isTR ? 'Video Linki (YouTube — opsiyonel)' : 'Video Link (YouTube — optional)'}</label>
-                                <input type="url" value={form.video_url} onChange={e => updateForm('video_url', e.target.value)} placeholder="https://youtube.com/watch?v=..." style={inputStyle} />
-                            </div>
 
                             {/* KKTC-Specific: Rental Fields */}
                             {form.type === 'rent' && (
