@@ -3,14 +3,15 @@
 import { useState, useEffect, useMemo } from 'react';
 import { type Locale, localeNames, localeFlags, locales, t } from '@/i18n/translations';
 import './properties.css';
-import { getProperties, formatPrice, getScoreColor } from '@/lib/properties';
+import { getProperties, getScoreColor } from '@/lib/properties';
 import { type Property } from '@/lib/supabase';
 import { getCurrentUser, signOut, onAuthChange } from '@/lib/auth';
 import { getFavorites, toggleFavorite } from '@/lib/favorites';
+import { convertPrice, formatCurrency, currencies, type Currency } from '@/lib/currency';
 import ChatbotWidget from '@/components/ChatbotWidget';
 import AuthModal from '@/components/AuthModal';
 
-function PropertyCard({ property, locale, isFav, onToggleFav }: { property: Property; locale: Locale; isFav: boolean; onToggleFav: () => void }) {
+function PropertyCard({ property, locale, isFav, onToggleFav, displayCurrency }: { property: Property; locale: Locale; isFav: boolean; onToggleFav: () => void; displayCurrency: Currency }) {
     const title = locale === 'tr' ? property.title_tr : property.title_en;
     const isRent = property.type === 'rent';
 
@@ -47,7 +48,7 @@ function PropertyCard({ property, locale, isFav, onToggleFav }: { property: Prop
 
             <div className="property-content">
                 <div className="property-price">
-                    {formatPrice(property.price, property.currency)}
+                    {formatCurrency(convertPrice(property.price, property.currency, displayCurrency), displayCurrency)}
                     {isRent && <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>/mo</span>}
                 </div>
                 <h3 className="property-title">{title}</h3>
@@ -82,6 +83,7 @@ export default function PropertiesPage() {
     const [cityFilter, setCityFilter] = useState<string>('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState<'newest' | 'price-low' | 'price-high' | 'score'>('newest');
+    const [displayCurrency, setDisplayCurrency] = useState<Currency>('GBP');
     const [properties, setProperties] = useState<Property[]>([]);
     const [loading, setLoading] = useState(true);
     const [showAuth, setShowAuth] = useState(false);
@@ -202,6 +204,10 @@ export default function PropertiesPage() {
                             <option value="price-high">{locale === 'tr' ? '💰 Fiyat ↓' : '💰 Price ↓'}</option>
                             <option value="score">{locale === 'tr' ? '⭐ Puan' : '⭐ Score'}</option>
                         </select>
+                        <select value={displayCurrency} onChange={(e) => setDisplayCurrency(e.target.value as Currency)}
+                            style={{ padding: '8px 12px', background: 'var(--bg-darker)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)', minWidth: '70px' }}>
+                            {currencies.map(c => <option key={c} value={c}>{{ GBP: '£ GBP', EUR: '€ EUR', USD: '$ USD', TRY: '₺ TRY' }[c]}</option>)}
+                        </select>
                     </div>
 
                     {/* Property Grid */}
@@ -223,6 +229,7 @@ export default function PropertiesPage() {
                                     property={p}
                                     locale={locale}
                                     isFav={favIds.includes(p.id)}
+                                    displayCurrency={displayCurrency}
                                     onToggleFav={async () => {
                                         if (!user) { setShowAuth(true); return; }
                                         const nowFav = await toggleFavorite(user.id, p.id);
