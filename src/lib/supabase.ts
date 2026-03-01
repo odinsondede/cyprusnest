@@ -34,6 +34,18 @@ export interface Property {
     agent_id: string | null;
     cyprusnest_score: number | null;
     views_count: number;
+    // KKTC rental-specific fields
+    deposit_amount: number;
+    contract_type: 'monthly' | 'sixmonth' | 'yearly' | 'flexible';
+    title_deed_type: 'turkish' | 'equivalent' | 'allocation' | 'foreign' | 'unknown';
+    bills_included: boolean;
+    available_now: boolean;
+    available_date: string | null;
+    monthly_fees: number;
+    nearby_landmarks: string[];
+    parking: boolean;
+    pool: boolean;
+    sea_view: boolean;
     created_at: string;
     updated_at: string;
 }

@@ -28,6 +28,17 @@ export default function AddPropertyPage() {
         bedrooms: '1', bathrooms: '1', area_sqm: '',
         furnished: false,
         features: '',
+        // KKTC fields
+        deposit_amount: '1',
+        contract_type: 'yearly' as 'monthly' | 'sixmonth' | 'yearly' | 'flexible',
+        title_deed_type: 'turkish' as 'turkish' | 'equivalent' | 'allocation' | 'foreign' | 'unknown',
+        bills_included: false,
+        available_now: true,
+        monthly_fees: '0',
+        nearby_landmarks: '',
+        parking: false,
+        pool: false,
+        sea_view: false,
     });
 
     const isTR = locale === 'tr';
@@ -53,6 +64,11 @@ export default function AddPropertyPage() {
             .map(f => f.trim())
             .filter(f => f.length > 0);
 
+        const landmarksArr = form.nearby_landmarks
+            .split(',')
+            .map(l => l.trim())
+            .filter(l => l.length > 0);
+
         const { error: insertError } = await supabase.from('properties').insert({
             title_tr: form.title_tr,
             title_en: form.title_en || form.title_tr,
@@ -72,6 +88,16 @@ export default function AddPropertyPage() {
             photos: [],
             cyprusnest_score: null,
             views_count: 0,
+            deposit_amount: Number(form.deposit_amount),
+            contract_type: form.contract_type,
+            title_deed_type: form.title_deed_type,
+            bills_included: form.bills_included,
+            available_now: form.available_now,
+            monthly_fees: Number(form.monthly_fees),
+            nearby_landmarks: landmarksArr,
+            parking: form.parking,
+            pool: form.pool,
+            sea_view: form.sea_view,
         });
 
         if (insertError) {
@@ -154,7 +180,7 @@ export default function AddPropertyPage() {
                             </p>
                             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
                                 <a href="/properties" className="btn btn-primary">{isTR ? 'İlanları Gör' : 'View Listings'}</a>
-                                <button className="btn btn-outline" onClick={() => { setSuccess(false); setForm({ title_tr: '', title_en: '', description_tr: '', description_en: '', type: 'rent', price: '', city: 'Lefkoşa', district: '', bedrooms: '1', bathrooms: '1', area_sqm: '', furnished: false, features: '' }); }}>
+                                <button className="btn btn-outline" onClick={() => { setSuccess(false); setForm({ title_tr: '', title_en: '', description_tr: '', description_en: '', type: 'rent', price: '', city: 'Lefkoşa', district: '', bedrooms: '1', bathrooms: '1', area_sqm: '', furnished: false, features: '', deposit_amount: '1', contract_type: 'yearly', title_deed_type: 'turkish', bills_included: false, available_now: true, monthly_fees: '0', nearby_landmarks: '', parking: false, pool: false, sea_view: false }); }}>
                                     {isTR ? 'Yeni İlan Ekle' : 'Add Another'}
                                 </button>
                             </div>
@@ -248,6 +274,88 @@ export default function AddPropertyPage() {
                                 <label style={labelStyle}>{isTR ? 'Özellikler (virgülle ayır)' : 'Features (comma separated)'}</label>
                                 <input type="text" value={form.features} onChange={e => updateForm('features', e.target.value)}
                                     placeholder="Klima, Otopark, Havuz, Wi-Fi" style={inputStyle} />
+                            </div>
+
+                            {/* KKTC-Specific: Rental Fields */}
+                            {form.type === 'rent' && (
+                                <>
+                                    <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', marginTop: '4px' }}>
+                                        <label style={{ ...labelStyle, fontSize: '0.95rem', color: 'var(--primary-light)', marginBottom: '16px' }}>
+                                            🔑 {isTR ? 'Kiralık Detayları' : 'Rental Details'}
+                                        </label>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+                                        <div>
+                                            <label style={labelStyle}>{isTR ? 'Depozito (kira sayısı)' : 'Deposit (months)'}</label>
+                                            <select value={form.deposit_amount} onChange={e => updateForm('deposit_amount', e.target.value)} style={inputStyle}>
+                                                <option value="0">{isTR ? 'Yok' : 'None'}</option>
+                                                <option value="1">1 {isTR ? 'kira' : 'month'}</option>
+                                                <option value="2">2 {isTR ? 'kira' : 'months'}</option>
+                                                <option value="3">3 {isTR ? 'kira' : 'months'}</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label style={labelStyle}>{isTR ? 'Sözleşme Süresi' : 'Contract Type'}</label>
+                                            <select value={form.contract_type} onChange={e => updateForm('contract_type', e.target.value)} style={inputStyle}>
+                                                <option value="monthly">{isTR ? 'Aylık' : 'Monthly'}</option>
+                                                <option value="sixmonth">{isTR ? '6 Ay' : '6 Months'}</option>
+                                                <option value="yearly">{isTR ? 'Yıllık' : 'Yearly'}</option>
+                                                <option value="flexible">{isTR ? 'Esnek' : 'Flexible'}</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label style={labelStyle}>{isTR ? 'Aylık Aidat (£)' : 'Monthly Fees (£)'}</label>
+                                            <input type="number" min="0" value={form.monthly_fees} onChange={e => updateForm('monthly_fees', e.target.value)} placeholder="50" style={inputStyle} />
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: 'var(--text-primary)' }}>
+                                            <input type="checkbox" checked={form.bills_included} onChange={e => updateForm('bills_included', e.target.checked)} />
+                                            💡 {isTR ? 'Faturalar Dahil' : 'Bills Included'}
+                                        </label>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: 'var(--text-primary)' }}>
+                                            <input type="checkbox" checked={form.available_now} onChange={e => updateForm('available_now', e.target.checked)} />
+                                            🟢 {isTR ? 'Hemen Müsait' : 'Available Now'}
+                                        </label>
+                                    </div>
+                                </>
+                            )}
+
+                            {/* Title Deed - for sale */}
+                            {form.type === 'sale' && (
+                                <div>
+                                    <label style={labelStyle}>{isTR ? 'Tapu Türü' : 'Title Deed Type'} *</label>
+                                    <select value={form.title_deed_type} onChange={e => updateForm('title_deed_type', e.target.value)} style={inputStyle}>
+                                        <option value="turkish">{isTR ? 'Türk Koçanı' : 'Turkish Title'}</option>
+                                        <option value="equivalent">{isTR ? 'Eşdeğer Koçan' : 'Equivalent Title'}</option>
+                                        <option value="allocation">{isTR ? 'Tahsis' : 'Allocation'}</option>
+                                        <option value="foreign">{isTR ? 'Yabancı Koçan' : 'Foreign Title'}</option>
+                                        <option value="unknown">{isTR ? 'Bilinmiyor' : 'Unknown'}</option>
+                                    </select>
+                                </div>
+                            )}
+
+                            {/* Extras */}
+                            <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: 'var(--text-primary)' }}>
+                                    <input type="checkbox" checked={form.parking} onChange={e => updateForm('parking', e.target.checked)} />
+                                    🅿️ {isTR ? 'Otopark' : 'Parking'}
+                                </label>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: 'var(--text-primary)' }}>
+                                    <input type="checkbox" checked={form.pool} onChange={e => updateForm('pool', e.target.checked)} />
+                                    🏊 {isTR ? 'Havuz' : 'Pool'}
+                                </label>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: 'var(--text-primary)' }}>
+                                    <input type="checkbox" checked={form.sea_view} onChange={e => updateForm('sea_view', e.target.checked)} />
+                                    🌊 {isTR ? 'Deniz Manzarası' : 'Sea View'}
+                                </label>
+                            </div>
+
+                            {/* Nearby */}
+                            <div>
+                                <label style={labelStyle}>{isTR ? 'Yakın Noktalar (virgülle ayır)' : 'Nearby Landmarks (comma separated)'}</label>
+                                <input type="text" value={form.nearby_landmarks} onChange={e => updateForm('nearby_landmarks', e.target.value)}
+                                    placeholder={isTR ? 'YDÜ 5dk, Market 2dk, Hastane 10dk' : 'NEU 5min, Market 2min, Hospital 10min'} style={inputStyle} />
                             </div>
 
                             {error && (
