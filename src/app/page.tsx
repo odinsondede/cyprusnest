@@ -125,10 +125,15 @@ export default function Home() {
                 style={{ margin: '0 0 24px', maxWidth: '100%' }}
                 onSubmit={(e) => {
                   e.preventDefault();
-                  window.location.href = `/properties?type=${listingType}`;
+                  const input = e.currentTarget.querySelector('input') as HTMLInputElement;
+                  const search = input?.value?.trim() || '';
+                  const params = new URLSearchParams();
+                  params.set('type', listingType);
+                  if (search) params.set('search', search);
+                  window.location.href = `/properties?${params.toString()}`;
                 }}
               >
-                <input type="text" placeholder={txt.searchPlaceholder} />
+                <input type="text" name="search" placeholder={txt.searchPlaceholder} />
                 <button type="submit">{txt.search}</button>
               </form>
 

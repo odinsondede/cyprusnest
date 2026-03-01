@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { type Locale, t } from '@/i18n/translations';
 import './properties.css';
 import { getProperties, getScoreColor, PAGE_SIZE } from '@/lib/properties';
@@ -111,11 +112,19 @@ function PropertyCard({ property, locale, isFav, onToggleFav, displayCurrency }:
     );
 }
 
-export default function PropertiesPage() {
+function PropertiesContent() {
+    const searchParams = useSearchParams();
     const [locale, setLocale] = useState<Locale>('tr');
-    const [typeFilter, setTypeFilter] = useState<'all' | 'rent' | 'sale'>('all');
-    const [cityFilter, setCityFilter] = useState<string>('all');
-    const [searchQuery, setSearchQuery] = useState('');
+    const [typeFilter, setTypeFilter] = useState<'all' | 'rent' | 'sale'>(() => {
+        const t = searchParams.get('type');
+        return t === 'rent' || t === 'sale' ? t : 'all';
+    });
+    const [cityFilter, setCityFilter] = useState<string>(() => {
+        return searchParams.get('city') || 'all';
+    });
+    const [searchQuery, setSearchQuery] = useState(() => {
+        return searchParams.get('search') || '';
+    });
     const [sortBy, setSortBy] = useState<'newest' | 'price-low' | 'price-high' | 'score'>('newest');
     const [displayCurrency, setDisplayCurrency] = useState<Currency>('GBP');
     const [properties, setProperties] = useState<Property[]>([]);
@@ -323,5 +332,13 @@ export default function PropertiesPage() {
             <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} locale={locale} />
             <ChatbotWidget locale={locale} />
         </div>
+    );
+}
+
+export default function PropertiesPage() {
+    return (
+        <Suspense fallback={<div style={{ minHeight: '100vh', paddingTop: '120px', textAlign: 'center' }}>Yükleniyor...</div>}>
+            <PropertiesContent />
+        </Suspense>
     );
 }
