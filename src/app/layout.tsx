@@ -5,7 +5,7 @@ import "./globals.css";
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#0a0e1a',
+  themeColor: '#1B6B93',
 };
 
 export const metadata: Metadata = {
@@ -56,7 +56,13 @@ export const metadata: Metadata = {
       "ar": "https://evlek.app?lang=ar",
     },
   },
-  icons: { icon: "/favicon.ico" },
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
+    apple: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
@@ -65,7 +71,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="tr">
       <head>
         {/* Schema.org — Organization */}
         <script
