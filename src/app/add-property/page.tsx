@@ -555,9 +555,10 @@ function AddPropertyContent() {
                                     onDrop={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
-                                        const MAX_SIZE = 10 * 1024 * 1024;
-                                        const allFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
-                                        const validFiles = allFiles.filter(f => f.size <= MAX_SIZE);
+                                        const allFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/') || f.type.startsWith('video/'));
+                                        const MAX_IMG = 10 * 1024 * 1024;
+                                        const MAX_VID = 50 * 1024 * 1024;
+                                        const validFiles = allFiles.filter(f => f.type.startsWith('video/') ? f.size <= MAX_VID : f.size <= MAX_IMG);
                                         if (validFiles.length < allFiles.length) {
                                             alert(isTR ? `${allFiles.length - validFiles.length} dosya 10MB limitini aşıyor.` : `${allFiles.length - validFiles.length} file(s) exceed 10MB limit.`);
                                         }
@@ -573,26 +574,27 @@ function AddPropertyContent() {
                                         background: 'rgba(14,165,233,0.03)', transition: 'all 0.2s',
                                     }}
                                 >
-                                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📷</div>
+                                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📷🎬</div>
                                     <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                                        {isTR ? 'Tıklayın veya fotoğraf sürükleyin' : 'Click or drag photos here'}
+                                        {isTR ? 'Fotoğraf ve Video sürükleyin veya tıklayın' : 'Drag & drop photos and videos or click'}
                                     </p>
                                     <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '4px' }}>
-                                        JPG, PNG, WebP — max 10MB
+                                        {isTR ? 'Fotoğraf: JPG/PNG/WebP (max 10MB) — Video: MP4/MOV/WebM (max 50MB)' : 'Photos: JPG/PNG/WebP (max 10MB) — Videos: MP4/MOV/WebM (max 50MB)'}
                                     </p>
                                 </div>
                                 <input
                                     ref={fileInputRef}
                                     type="file"
-                                    accept="image/jpeg,image/png,image/webp"
+                                    accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm"
                                     multiple
                                     style={{ display: 'none' }}
                                     onChange={(e) => {
-                                        const MAX_SIZE = 10 * 1024 * 1024;
+                                        const MAX_IMG = 10 * 1024 * 1024;
+                                        const MAX_VID = 50 * 1024 * 1024;
                                         const allFiles = Array.from(e.target.files || []);
-                                        const validFiles = allFiles.filter(f => f.size <= MAX_SIZE);
+                                        const validFiles = allFiles.filter(f => f.type.startsWith('video/') ? f.size <= MAX_VID : f.size <= MAX_IMG);
                                         if (validFiles.length < allFiles.length) {
-                                            alert(isTR ? `${allFiles.length - validFiles.length} dosya 10MB limitini aşıyor.` : `${allFiles.length - validFiles.length} file(s) exceed 10MB limit.`);
+                                            alert(isTR ? `${allFiles.length - validFiles.length} dosya limiti aşıyor.` : `${allFiles.length - validFiles.length} file(s) exceed size limit.`);
                                         }
                                         const files = validFiles.slice(0, 20 - photos.length);
                                         if (files.length === 0) return;

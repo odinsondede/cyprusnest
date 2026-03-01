@@ -46,7 +46,15 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
     const title = locale === 'tr' ? property.title_tr : property.title_en;
     const desc = locale === 'tr' ? (property.description_tr || property.description_en) : (property.description_en || property.description_tr);
     const isRent = property.type === 'rent';
-    const whatsappNumber = '905338517878'; // Default Evlek number
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const p = property as any;
+    const whatsappNum = p.whatsapp || p.phone || '905338517878';
+    const phoneNum = p.phone || whatsappNum;
+    const telegramUser = p.telegram as string | undefined;
+    const listingUrl = `https://evlek.app/properties/${id}`;
+    const autoMsgTR = `Merhaba, Evlek'te gördüğüm "${title}" ilanı hakkında bilgi almak istiyorum.\n${listingUrl}`;
+    const autoMsgEN = `Hello, I'd like to inquire about "${title}" on Evlek.\n${listingUrl}`;
+    const autoMsg = locale === 'tr' ? autoMsgTR : autoMsgEN;
 
     return (
         <div>
@@ -215,20 +223,27 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                             )}
 
                             {/* CTA Actions */}
-                            <div className="detail-actions">
+                            <div className="detail-actions" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                                 <a
-                                    href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-                                        locale === 'tr'
-                                            ? `Merhaba, Evlek'te gördüğüm "${title}" hakkında bilgi almak istiyorum.`
-                                            : `Hello, I'd like to inquire about "${title}" that I saw on Evlek.`
-                                    )}`}
+                                    href={`https://wa.me/${whatsappNum.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(autoMsg)}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="btn btn-whatsapp btn-lg"
                                     style={{ flex: 1 }}
                                 >
-                                    💬 WhatsApp
+                                    🟢 WhatsApp
                                 </a>
+                                {telegramUser && (
+                                    <a
+                                        href={`https://t.me/${telegramUser.replace('@', '')}?text=${encodeURIComponent(autoMsg)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="btn btn-lg"
+                                        style={{ flex: 1, background: 'linear-gradient(135deg, #0088cc, #229ED9)', color: 'white', border: 'none' }}
+                                    >
+                                        ✈️ Telegram
+                                    </a>
+                                )}
                                 <button
                                     className="btn btn-outline btn-lg"
                                     style={{ flex: 1 }}
@@ -239,7 +254,7 @@ export default function PropertyDetailPage({ params }: { params: Promise<{ id: s
                             </div>
 
                             <a
-                                href={`tel:+${whatsappNumber}`}
+                                href={`tel:${phoneNum}`}
                                 className="btn btn-primary btn-lg"
                                 style={{ width: '100%', marginTop: '12px', textAlign: 'center' }}
                             >
