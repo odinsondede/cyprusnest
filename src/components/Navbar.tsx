@@ -8,7 +8,7 @@ import AuthModal from './AuthModal';
 interface NavbarProps {
     locale: Locale;
     onLocaleChange: (locale: Locale) => void;
-    activePage?: 'home' | 'properties' | 'legal' | 'blog' | 'admin' | 'add-property';
+    activePage?: 'home' | 'properties' | 'legal' | 'blog' | 'admin' | 'add-property' | 'pricing';
 }
 
 export default function Navbar({ locale, onLocaleChange, activePage }: NavbarProps) {
@@ -40,6 +40,7 @@ export default function Navbar({ locale, onLocaleChange, activePage }: NavbarPro
                         <li><a href="/properties" onClick={() => setMenuOpen(false)}>{t(locale, 'nav.buy')}</a></li>
                         <li><a href="/legal" onClick={() => setMenuOpen(false)} style={linkStyle('legal')}>{t(locale, 'nav.legal')}</a></li>
                         <li><a href="/blog" onClick={() => setMenuOpen(false)} style={linkStyle('blog')}>Blog</a></li>
+                        <li><a href="/pricing" onClick={() => setMenuOpen(false)} style={linkStyle('pricing')}>{locale === 'tr' ? 'Fiyatlar' : 'Pricing'}</a></li>
                     </ul>
                     <div className="navbar-right">
                         <select className="lang-selector" value={locale} onChange={(e) => onLocaleChange(e.target.value as Locale)}>
