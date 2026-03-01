@@ -6,7 +6,7 @@ import ChatbotWidget from '@/components/ChatbotWidget';
 import Navbar from '@/components/Navbar';
 
 export default function Home() {
-  const [locale, setLocale] = useState<Locale>('en');
+  const [locale, setLocale] = useState<Locale>('tr');
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
 
   return (

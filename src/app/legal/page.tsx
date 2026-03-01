@@ -104,7 +104,7 @@ function calculateTax(price: number, isForeign: boolean) {
 }
 
 export default function LegalWizardPage() {
-    const [locale, setLocale] = useState<Locale>('en');
+    const [locale, setLocale] = useState<Locale>('tr');
     const [step, setStep] = useState<Step>('nationality');
     const [state, setState] = useState<WizardState>({
         nationality: '',

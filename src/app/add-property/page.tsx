@@ -13,7 +13,7 @@ import '../properties/properties.css';
 const cities = ['Lefkoşa', 'Girne', 'Gazimağusa', 'İskele', 'Güzelyurt', 'Lefke'];
 
 export default function AddPropertyPage() {
-    const [locale, setLocale] = useState<Locale>('en');
+    const [locale, setLocale] = useState<Locale>('tr');
     const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
     const [showAuth, setShowAuth] = useState(false);
     const [loading, setLoading] = useState(false);

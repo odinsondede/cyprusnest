@@ -130,7 +130,7 @@ const posts: BlogPost[] = [
 ];
 
 export default function BlogPage() {
-    const [locale, setLocale] = useState<Locale>('en');
+    const [locale, setLocale] = useState<Locale>('tr');
     const dir = locale === 'ar' ? 'rtl' : 'ltr';
 
     return (

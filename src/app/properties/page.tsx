@@ -112,7 +112,7 @@ function PropertyCard({ property, locale, isFav, onToggleFav, displayCurrency }:
 }
 
 export default function PropertiesPage() {
-    const [locale, setLocale] = useState<Locale>('en');
+    const [locale, setLocale] = useState<Locale>('tr');
     const [typeFilter, setTypeFilter] = useState<'all' | 'rent' | 'sale'>('all');
     const [cityFilter, setCityFilter] = useState<string>('all');
     const [searchQuery, setSearchQuery] = useState('');

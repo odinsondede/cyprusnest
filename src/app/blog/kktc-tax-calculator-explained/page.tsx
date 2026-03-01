@@ -190,7 +190,7 @@ Late registration incurs penalty fees.
 };
 
 export default function TaxCalculatorPage() {
-    const [locale, setLocale] = useState<Locale>('en');
+    const [locale, setLocale] = useState<Locale>('tr');
     const articleContent = content[locale] || content['en'];
 
     return (

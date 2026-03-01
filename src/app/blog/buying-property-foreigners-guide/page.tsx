@@ -212,7 +212,7 @@ Foreigners CANNOT buy:
 };
 
 export default function ForeignersGuidePage() {
-    const [locale, setLocale] = useState<Locale>('en');
+    const [locale, setLocale] = useState<Locale>('tr');
     const dir = locale === 'ar' ? 'rtl' : 'ltr';
     const articleContent = content[locale] || content['en'];
 

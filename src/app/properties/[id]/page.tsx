@@ -11,7 +11,7 @@ import '../properties.css';
 
 export default function PropertyDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
-    const [locale, setLocale] = useState<Locale>('en');
+    const [locale, setLocale] = useState<Locale>('tr');
     const [property, setProperty] = useState<Property | null>(null);
     const [loading, setLoading] = useState(true);
 

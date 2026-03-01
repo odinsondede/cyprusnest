@@ -166,7 +166,7 @@ Gönyeli is one of the fastest-growing districts in the TRNC, located west of Ni
 };
 
 export default function GonyeliRentalGuidePage() {
-    const [locale, setLocale] = useState<Locale>('en');
+    const [locale, setLocale] = useState<Locale>('tr');
     const articleContent = content[locale] || content['en'];
 
     return (

@@ -114,7 +114,7 @@ Good: "2+1 apartment in Gönyeli center, 5-min walk to NEU, 2nd floor, south-fac
 };
 
 export default function SellFasterPage() {
-    const [locale, setLocale] = useState<Locale>('en');
+    const [locale, setLocale] = useState<Locale>('tr');
     const articleContent = content[locale] || content['en'];
 
     return (

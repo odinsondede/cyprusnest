@@ -204,7 +204,7 @@ Deductions from gross rental income:
 };
 
 export default function RentalYieldPage() {
-    const [locale, setLocale] = useState<Locale>('en');
+    const [locale, setLocale] = useState<Locale>('tr');
     const articleContent = content[locale] || content['en'];
 
     return (

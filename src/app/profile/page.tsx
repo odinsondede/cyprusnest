@@ -9,7 +9,7 @@ import ChatbotWidget from '@/components/ChatbotWidget';
 import '../properties/properties.css';
 
 export default function ProfilePage() {
-    const [locale, setLocale] = useState<Locale>('en');
+    const [locale, setLocale] = useState<Locale>('tr');
     const [user, setUser] = useState<{ id: string; email?: string; user_metadata?: { full_name?: string } } | null>(null);
     const [myListings, setMyListings] = useState<Property[]>([]);
     const [loading, setLoading] = useState(true);
