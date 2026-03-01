@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { type Locale, localeNames, localeFlags, locales, t } from '@/i18n/translations';
 import './properties.css';
-import { getProperties, getScoreColor } from '@/lib/properties';
+import { getProperties, getScoreColor, PAGE_SIZE } from '@/lib/properties';
 import { type Property } from '@/lib/supabase';
 import { getCurrentUser, signOut, onAuthChange } from '@/lib/auth';
 import { getFavorites, toggleFavorite } from '@/lib/favorites';
@@ -119,6 +119,9 @@ export default function PropertiesPage() {
     const [displayCurrency, setDisplayCurrency] = useState<Currency>('GBP');
     const [properties, setProperties] = useState<Property[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(false);
+    const [totalCount, setTotalCount] = useState(0);
     const [showAuth, setShowAuth] = useState(false);
     const [user, setUser] = useState<{ id: string } | null>(null);
     const [favIds, setFavIds] = useState<string[]>([]);
@@ -155,17 +158,34 @@ export default function PropertiesPage() {
     useEffect(() => {
         async function fetchData() {
             setLoading(true);
-            const data = await getProperties({
+            const result = await getProperties({
                 type: typeFilter === 'all' ? undefined : typeFilter,
                 city: cityFilter === 'all' ? undefined : cityFilter,
                 search: searchQuery || undefined,
                 sortBy,
+                offset: 0,
             });
-            setProperties(data);
+            setProperties(result.data);
+            setTotalCount(result.count);
+            setHasMore(result.hasMore);
             setLoading(false);
         }
         fetchData();
     }, [typeFilter, cityFilter, searchQuery, sortBy]);
+
+    async function loadMore() {
+        setLoadingMore(true);
+        const result = await getProperties({
+            type: typeFilter === 'all' ? undefined : typeFilter,
+            city: cityFilter === 'all' ? undefined : cityFilter,
+            search: searchQuery || undefined,
+            sortBy,
+            offset: properties.length,
+        });
+        setProperties(prev => [...prev, ...result.data]);
+        setHasMore(result.hasMore);
+        setLoadingMore(false);
+    }
 
     const cities = useMemo(() => {
         const c = new Set(properties.map(p => p.city));
@@ -296,22 +316,32 @@ export default function PropertiesPage() {
                             <p>{locale === 'tr' ? 'İlan bulunamadı' : 'No properties found'}</p>
                         </div>
                     ) : (
-                        <div className="properties-grid">
-                            {filteredProperties.map((p) => (
-                                <PropertyCard
-                                    key={p.id}
-                                    property={p}
-                                    locale={locale}
-                                    isFav={favIds.includes(p.id)}
-                                    displayCurrency={displayCurrency}
-                                    onToggleFav={async () => {
-                                        if (!user) { setShowAuth(true); return; }
-                                        const nowFav = await toggleFavorite(user.id, p.id);
-                                        setFavIds(prev => nowFav ? [...prev, p.id] : prev.filter(id => id !== p.id));
-                                    }}
-                                />
-                            ))}
-                        </div>
+                        <>
+                            <div className="properties-grid">
+                                {filteredProperties.map((p) => (
+                                    <PropertyCard
+                                        key={p.id}
+                                        property={p}
+                                        locale={locale}
+                                        isFav={favIds.includes(p.id)}
+                                        displayCurrency={displayCurrency}
+                                        onToggleFav={async () => {
+                                            if (!user) { setShowAuth(true); return; }
+                                            const nowFav = await toggleFavorite(user.id, p.id);
+                                            setFavIds(prev => nowFav ? [...prev, p.id] : prev.filter(id => id !== p.id));
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                            {hasMore && (
+                                <div style={{ textAlign: 'center', marginTop: '32px' }}>
+                                    <button onClick={loadMore} disabled={loadingMore} className="btn btn-outline"
+                                        style={{ padding: '12px 40px', opacity: loadingMore ? 0.6 : 1 }}>
+                                        {loadingMore ? '⏳...' : locale === 'tr' ? `Daha Fazla Göster (${properties.length}/${totalCount})` : `Load More (${properties.length}/${totalCount})`}
+                                    </button>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </main>

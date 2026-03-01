@@ -1,14 +1,21 @@
 import { supabase, type Property } from './supabase';
 
+export const PAGE_SIZE = 12;
+
 export async function getProperties(filters?: {
     type?: 'rent' | 'sale';
     city?: string;
     search?: string;
     sortBy?: 'newest' | 'price-low' | 'price-high' | 'score';
-}) {
+    limit?: number;
+    offset?: number;
+}): Promise<{ data: Property[]; count: number; hasMore: boolean }> {
+    const limit = filters?.limit ?? PAGE_SIZE;
+    const offset = filters?.offset ?? 0;
+
     let query = supabase
         .from('properties')
-        .select('*')
+        .select('*', { count: 'exact' })
         .eq('status', 'active');
 
     if (filters?.type) {
@@ -35,12 +42,19 @@ export async function getProperties(filters?: {
             query = query.order('created_at', { ascending: false });
     }
 
-    const { data, error } = await query;
+    query = query.range(offset, offset + limit - 1);
+
+    const { data, error, count } = await query;
     if (error) {
         console.error('Error fetching properties:', error);
-        return [];
+        return { data: [], count: 0, hasMore: false };
     }
-    return data as Property[];
+    const total = count ?? 0;
+    return {
+        data: data as Property[],
+        count: total,
+        hasMore: offset + limit < total,
+    };
 }
 
 export async function getPropertyById(id: string) {
