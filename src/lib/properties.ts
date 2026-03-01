@@ -84,10 +84,19 @@ export async function getCities(): Promise<string[]> {
 
 export async function incrementViews(propertyId: string) {
     try {
-        await supabase
+        // Use Supabase's built-in way to increment
+        const { data } = await supabase
             .from('properties')
-            .update({ views_count: 1 })
-            .eq('id', propertyId);
+            .select('views_count')
+            .eq('id', propertyId)
+            .single();
+
+        if (data) {
+            await supabase
+                .from('properties')
+                .update({ views_count: (data.views_count || 0) + 1 })
+                .eq('id', propertyId);
+        }
     } catch {
         // silently fail
     }
