@@ -264,8 +264,8 @@ export default function Home() {
             <div className="footer-col">
               <h4>{t(locale, 'footer.company')}</h4>
               <ul>
-                <li><a href="#">{t(locale, 'footer.about')}</a></li>
-                <li><a href="#">{t(locale, 'footer.contact')}</a></li>
+                <li><a href="/about">{t(locale, 'footer.about')}</a></li>
+                <li><a href="/contact">{t(locale, 'footer.contact')}</a></li>
               </ul>
             </div>
 

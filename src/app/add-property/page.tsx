@@ -346,7 +346,13 @@ function AddPropertyContent() {
                                     multiple
                                     style={{ display: 'none' }}
                                     onChange={(e) => {
-                                        const files = Array.from(e.target.files || []).slice(0, 8 - photos.length);
+                                        const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+                                        const allFiles = Array.from(e.target.files || []);
+                                        const validFiles = allFiles.filter(f => f.size <= MAX_SIZE);
+                                        if (validFiles.length < allFiles.length) {
+                                            alert(isTR ? `${allFiles.length - validFiles.length} dosya 5MB limitini aşıyor ve eklenmedi.` : `${allFiles.length - validFiles.length} file(s) exceed 5MB limit and were skipped.`);
+                                        }
+                                        const files = validFiles.slice(0, 8 - photos.length);
                                         if (files.length === 0) return;
                                         setPhotos(prev => [...prev, ...files].slice(0, 8));
                                         const newPreviews = files.map(f => URL.createObjectURL(f));
