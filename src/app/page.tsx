@@ -1,65 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { type Locale, localeNames, localeFlags, locales, t } from '@/i18n/translations';
-import { getCurrentUser, signOut, onAuthChange } from '@/lib/auth';
+import { useState } from 'react';
+import { type Locale, locales, localeFlags, t } from '@/i18n/translations';
 import ChatbotWidget from '@/components/ChatbotWidget';
-import AuthModal from '@/components/AuthModal';
+import Navbar from '@/components/Navbar';
 
 export default function Home() {
   const [locale, setLocale] = useState<Locale>('en');
-  const [showAuth, setShowAuth] = useState(false);
-  const [user, setUser] = useState<unknown>(null);
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
-
-  useEffect(() => {
-    getCurrentUser().then(u => setUser(u));
-    const { data: { subscription } } = onAuthChange((u) => setUser(u));
-    return () => subscription.unsubscribe();
-  }, []);
 
   return (
     <div dir={dir}>
-      {/* ========== NAVBAR ========== */}
-      <nav className="navbar">
-        <div className="container">
-          <a href="/" className="navbar-logo">
-            <span className="logo-icon">🏠</span>
-            <span className="logo-text">CyprusNest</span>
-          </a>
-
-          <ul className="navbar-links">
-            <li><a href="/properties">{t(locale, 'nav.rent')}</a></li>
-            <li><a href="/properties">{t(locale, 'nav.buy')}</a></li>
-            <li><a href="/legal">{t(locale, 'nav.legal')}</a></li>
-            <li><a href="/blog">Blog</a></li>
-          </ul>
-
-          <div className="navbar-right">
-            <select
-              className="lang-selector"
-              value={locale}
-              onChange={(e) => setLocale(e.target.value as Locale)}
-            >
-              {locales.map((l) => (
-                <option key={l} value={l}>
-                  {localeFlags[l]} {localeNames[l]}
-                </option>
-              ))}
-            </select>
-            {user ? (
-              <button className="btn btn-ghost" onClick={async () => { await signOut(); setUser(null); }}>
-                🚪 {locale === 'tr' ? 'Çıkış' : 'Logout'}
-              </button>
-            ) : (
-              <>
-                <button className="btn btn-ghost" onClick={() => setShowAuth(true)}>{t(locale, 'nav.login')}</button>
-                <button className="btn btn-primary" onClick={() => setShowAuth(true)}>{t(locale, 'nav.register')}</button>
-              </>
-            )}
-          </div>
-        </div>
-      </nav>
+      <Navbar locale={locale} onLocaleChange={setLocale} activePage="home" />
 
       {/* ========== HERO ========== */}
       <section className="hero">
@@ -266,9 +218,6 @@ export default function Home() {
           </div>
         </div>
       </footer>
-
-      {/* Auth Modal */}
-      <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} locale={locale} />
 
       {/* AI Chatbot */}
       <ChatbotWidget locale={locale} />

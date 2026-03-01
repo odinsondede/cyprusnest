@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { type Locale, localeNames, localeFlags, locales, t } from '@/i18n/translations';
+import { type Locale, t } from '@/i18n/translations';
 import './properties.css';
 import { getProperties, getScoreColor, PAGE_SIZE } from '@/lib/properties';
 import { type Property } from '@/lib/supabase';
-import { getCurrentUser, signOut, onAuthChange } from '@/lib/auth';
+import { getCurrentUser, onAuthChange } from '@/lib/auth';
 import { getFavorites, toggleFavorite } from '@/lib/favorites';
 import { convertPrice, formatCurrency, currencies, type Currency } from '@/lib/currency';
+import Navbar from '@/components/Navbar';
 import ChatbotWidget from '@/components/ChatbotWidget';
 import AuthModal from '@/components/AuthModal';
 
@@ -125,7 +126,6 @@ export default function PropertiesPage() {
     const [showAuth, setShowAuth] = useState(false);
     const [user, setUser] = useState<{ id: string } | null>(null);
     const [favIds, setFavIds] = useState<string[]>([]);
-    const [menuOpen, setMenuOpen] = useState(false);
     const [quickFilters, setQuickFilters] = useState({
         available_now: false, bills_included: false, furnished: false,
         parking: false, pool: false, sea_view: false,
@@ -195,37 +195,7 @@ export default function PropertiesPage() {
 
     return (
         <div>
-            <nav className="navbar">
-                <div className="container">
-                    <a href="/" className="navbar-logo">
-                        <span className="logo-icon">🏠</span>
-                        <span className="logo-text">CyprusNest</span>
-                    </a>
-                    <button className="hamburger-btn" onClick={() => setMenuOpen(!menuOpen)}>
-                        {menuOpen ? '✕' : '☰'}
-                    </button>
-                    <ul className={`navbar-links ${menuOpen ? 'nav-open' : ''}`}>
-                        <li><a href="/properties" onClick={() => setMenuOpen(false)} style={{ color: 'var(--primary-light)' }}>{t(locale, 'nav.rent')}</a></li>
-                        <li><a href="/properties" onClick={() => setMenuOpen(false)}>{t(locale, 'nav.buy')}</a></li>
-                        <li><a href="/legal" onClick={() => setMenuOpen(false)}>{t(locale, 'nav.legal')}</a></li>
-                        <li><a href="/blog" onClick={() => setMenuOpen(false)}>Blog</a></li>
-                    </ul>
-                    <div className="navbar-right">
-                        <select className="lang-selector" value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
-                            {locales.map((l) => (<option key={l} value={l}>{localeFlags[l]} {localeNames[l]}</option>))}
-                        </select>
-                        {user ? (
-                            <button className="btn btn-outline btn-sm" onClick={async () => { await signOut(); setUser(null); }}>
-                                🚪 {locale === 'tr' ? 'Çıkış' : 'Logout'}
-                            </button>
-                        ) : (
-                            <button className="btn btn-primary btn-sm" onClick={() => setShowAuth(true)}>
-                                {t(locale, 'nav.login')}
-                            </button>
-                        )}
-                    </div>
-                </div>
-            </nav>
+            <Navbar locale={locale} onLocaleChange={setLocale} activePage="properties" />
 
             <main style={{ paddingTop: '100px', paddingBottom: '64px', minHeight: '100vh' }}>
                 <div className="container">
