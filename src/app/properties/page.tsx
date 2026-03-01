@@ -58,7 +58,38 @@ function PropertyCard({ property, locale, isFav, onToggleFav, displayCurrency }:
                     <span>🛏️ {property.bedrooms}</span>
                     <span>🚿 {property.bathrooms}</span>
                     <span>📐 {property.area_sqm}m²</span>
+                    {property.parking && <span>🅿️</span>}
+                    {property.pool && <span>🏊</span>}
+                    {property.sea_view && <span>🌊</span>}
                 </div>
+
+                {/* KKTC rental badges */}
+                {isRent && (
+                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                        {property.available_now && (
+                            <span style={{ padding: '2px 8px', borderRadius: '9999px', fontSize: '0.7rem', fontWeight: 600, background: 'rgba(16,185,129,0.15)', color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' }}>
+                                🟢 {locale === 'tr' ? 'Hemen Müsait' : 'Available Now'}
+                            </span>
+                        )}
+                        {property.bills_included && (
+                            <span style={{ padding: '2px 8px', borderRadius: '9999px', fontSize: '0.7rem', fontWeight: 600, background: 'rgba(14,165,233,0.15)', color: '#0ea5e9', border: '1px solid rgba(14,165,233,0.2)' }}>
+                                💡 {locale === 'tr' ? 'Faturalar Dahil' : 'Bills Incl.'}
+                            </span>
+                        )}
+                        {property.deposit_amount > 0 && (
+                            <span style={{ padding: '2px 8px', borderRadius: '9999px', fontSize: '0.7rem', fontWeight: 600, background: 'rgba(245,158,11,0.15)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.2)' }}>
+                                💰 {property.deposit_amount} {locale === 'tr' ? 'kira depozito' : 'mo deposit'}
+                            </span>
+                        )}
+                    </div>
+                )}
+
+                {/* Nearby landmarks */}
+                {property.nearby_landmarks && property.nearby_landmarks.length > 0 && (
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '8px' }}>
+                        📌 {property.nearby_landmarks.slice(0, 3).join(' • ')}
+                    </div>
+                )}
 
                 <div className="property-features">
                     {(property.features || []).slice(0, 3).map((f: string) => (
