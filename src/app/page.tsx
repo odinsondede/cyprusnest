@@ -161,17 +161,31 @@ export default function Home() {
                 <button type="submit">{txt.search}</button>
               </form>
 
-              {/* Minimal trust line */}
-              <p style={{
-                fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 500,
-                letterSpacing: '0.03em',
-              }}>
-                {txt.trust}
-              </p>
+              {/* Quick actions for target audiences */}
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <a href="/properties?type=rent" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  padding: '8px 16px', borderRadius: '999px',
+                  background: 'rgba(27,107,147,0.08)', color: 'var(--primary)',
+                  fontSize: '0.82rem', fontWeight: 600, transition: 'all 0.2s',
+                  border: '1px solid rgba(27,107,147,0.15)',
+                }}>
+                  🎓 {isTR ? 'Kiralık Daire Arıyorum' : 'Find a Rental'}
+                </a>
+                <a href="/add-property" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  padding: '8px 16px', borderRadius: '999px',
+                  background: 'rgba(45,139,92,0.08)', color: 'var(--success)',
+                  fontSize: '0.82rem', fontWeight: 600, transition: 'all 0.2s',
+                  border: '1px solid rgba(45,139,92,0.15)',
+                }}>
+                  🏢 {isTR ? 'Ücretsiz İlan Ver' : 'List for Free'}
+                </a>
+              </div>
             </div>
 
             <div className="hero-image-wrapper">
-              <img src="/hero-villa.png" alt="North Cyprus Mediterranean Villa" />
+              <img src="/hero-villa.png" alt="Kyrenia coastline, North Cyprus" />
               <div className="hero-image-badge">
                 📍 {isTR ? 'Girne, KKTC' : 'Kyrenia, KKTC'}
               </div>
