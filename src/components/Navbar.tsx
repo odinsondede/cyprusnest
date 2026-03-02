@@ -36,8 +36,8 @@ export default function Navbar({ locale, onLocaleChange, activePage }: NavbarPro
                         {menuOpen ? '✕' : '☰'}
                     </button>
                     <ul className={`navbar-links ${menuOpen ? 'nav-open' : ''}`}>
-                        <li><a href="/properties" onClick={() => setMenuOpen(false)} style={linkStyle('properties')}>{t(locale, 'nav.rent')}</a></li>
-                        <li><a href="/properties" onClick={() => setMenuOpen(false)}>{t(locale, 'nav.buy')}</a></li>
+                        <li><a href="/properties?type=rent" onClick={() => setMenuOpen(false)} style={linkStyle('properties')}>{t(locale, 'nav.rent')}</a></li>
+                        <li><a href="/properties?type=sale" onClick={() => setMenuOpen(false)}>{t(locale, 'nav.buy')}</a></li>
                         <li><a href="/legal" onClick={() => setMenuOpen(false)} style={linkStyle('legal')}>{t(locale, 'nav.legal')}</a></li>
                         <li><a href="/blog" onClick={() => setMenuOpen(false)} style={linkStyle('blog')}>Blog</a></li>
                         <li><a href="/pricing" onClick={() => setMenuOpen(false)} style={linkStyle('pricing')}>{locale === 'tr' ? 'Fiyatlar' : 'Pricing'}</a></li>

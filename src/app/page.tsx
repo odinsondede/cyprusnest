@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react';
 import { type Locale, locales, localeFlags, t } from '@/i18n/translations';
 import { supabase, type Property } from '@/lib/supabase';
 import { convertPrice, formatCurrency, type Currency } from '@/lib/currency';
+import { useLocale } from '@/lib/useLocale';
 import ChatbotWidget from '@/components/ChatbotWidget';
 import CookieConsent from '@/components/CookieConsent';
 import Navbar from '@/components/Navbar';
 
 export default function Home() {
-  const [locale, setLocale] = useState<Locale>('tr');
-  const [listingType, setListingType] = useState<'rent' | 'sale'>('rent');
+  const [locale, setLocale] = useLocale();
   const [featuredProperties, setFeaturedProperties] = useState<Property[]>([]);
   const [cityCounts, setCityCounts] = useState<Record<string, number>>({});
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
