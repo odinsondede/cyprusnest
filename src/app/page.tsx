@@ -13,26 +13,20 @@ export default function Home() {
   const [listingType, setListingType] = useState<'rent' | 'sale'>('rent');
   const [featuredProperties, setFeaturedProperties] = useState<Property[]>([]);
   const [cityCounts, setCityCounts] = useState<Record<string, number>>({});
-  const [totalListings, setTotalListings] = useState(0);
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
   const isTR = locale === 'tr' || locale === 'ar' || locale === 'ru' || locale === 'de';
 
   useEffect(() => {
-    // Fetch featured properties
     supabase
       .from('properties')
       .select('*')
       .eq('status', 'active')
       .order('created_at', { ascending: false })
-      .limit(6)
+      .limit(3)
       .then(({ data }) => {
-        if (data) {
-          setFeaturedProperties(data as Property[]);
-          setTotalListings(data.length);
-        }
+        if (data) setFeaturedProperties(data as Property[]);
       });
 
-    // Fetch city counts
     supabase
       .from('properties')
       .select('city')
@@ -43,91 +37,80 @@ export default function Home() {
           data.forEach((p: { city: string }) => {
             counts[p.city] = (counts[p.city] || 0) + 1;
           });
-          setTotalListings(data.length);
           setCityCounts(counts);
         }
       });
   }, []);
 
-  const heroTexts = {
+  const txt = {
     tr: {
       tagline: 'Kuzey Kıbrıs\'ta Emlak Aramanın Yeni Yolu',
-      title: 'Hayalindeki Evi',
-      titleHighlight: 'Kolayca Bul.',
+      title: 'Hayalindeki Evi', titleHighlight: 'Kolayca Bul.',
       subtitle: 'Kiralık veya satılık mülkleri keşfet, AI asistanımızla anında bilgi al.',
       rent: 'Kiralık', sale: 'Satılık',
       searchPlaceholder: 'Lefkoşa, Girne, Gönyeli...',
       search: 'Ara',
-      trust1: 'AI Asistan', trust2: '5 Dil Desteği', trust3: 'Ücretsiz Kullan',
-      featuredTitle: 'Öne Çıkan İlanlar',
-      featuredSubtitle: 'Son eklenen mülkleri inceleyin',
-      viewAll: 'Tüm İlanlar →',
-      citiesTitle: 'Popüler Şehirler',
-      citiesSubtitle: 'KKTC\'nin en çok tercih edilen bölgelerini keşfedin',
-      whyTitle: 'Neden Evlek?',
-      whySubtitle: 'Kuzey Kıbrıs emlak deneyiminizi kolaylaştıran özellikler',
-      why1Title: 'AI Emlak Asistanı', why1Desc: 'Sorularınızı anında yanıtlar, size en uygun ilanları önerir.',
-      why2Title: '5 Dilde Hizmet', why2Desc: 'Türkçe, İngilizce, Rusça, Almanca ve Arapça tam destek.',
-      why3Title: 'Hukuki Rehber', why3Desc: 'KKTC\'de mülk alma süreci, vergiler ve yasal bilgiler.',
-      why4Title: 'Akıllı Filtreler', why4Desc: 'Faturalar dahil, eşyalı, havuzlu — aradığınızı hemen bulun.',
-      blogTitle: 'Bilgi Merkezi',
-      blogSubtitle: 'KKTC emlak hakkında size yardımcı olacak rehberler',
-      readMore: 'Devamını Oku →',
-      allBlog: 'Tüm Yazılar →',
-      statListings: 'Aktif İlan',
-      statCities: 'Şehir',
-      statLangs: 'Dil Desteği',
-      statAI: 'AI Asistan',
+      trust: 'AI destekli · 5 dil · Ücretsiz',
+      featuredTitle: 'Öne Çıkan İlanlar', featuredSub: 'Son eklenen mülkler', viewAll: 'Tüm İlanlar →',
+      citiesTitle: 'Popüler Bölgeler', citiesSub: 'KKTC\'nin en çok aranan şehirleri',
+      blogTitle: 'Bilgi Merkezi', blogSub: 'KKTC emlak hakkında rehberler', readMore: 'Oku →', allBlog: 'Tüm Yazılar →',
+      whyTitle: 'Neden Evlek?', whySub: 'Emlak aramanızı kolaylaştıran özellikler',
+      w1t: 'AI Emlak Asistanı', w1d: 'Sorularınızı anında yanıtlar, size en uygun ilanları önerir.',
+      w2t: '5 Dilde Hizmet', w2d: 'Türkçe, İngilizce, Rusça, Almanca ve Arapça tam destek.',
+      w3t: 'Hukuki Rehber', w3d: 'KKTC\'de mülk alma süreci, vergiler ve yasal bilgiler.',
+      w4t: 'Akıllı Filtreler', w4d: 'Faturalar dahil, eşyalı, havuzlu — aradığınızı hemen bulun.',
       ctaTitle: 'İlanınızı Ücretsiz Yayınlayın',
-      ctaSubtitle: 'Mülkünüzü binlerce potansiyel kiracı ve alıcıya ulaştırın.',
-      ctaButton: 'İlan Ekle',
-      ctaNote: 'Kayıt ol ve hemen ilanını paylaş — ücretsiz.',
+      ctaSub: 'Mülkünüzü binlerce potansiyel kiracı ve alıcıya ulaştırın.',
+      ctaBtn: 'İlan Ekle', ctaNote: 'Kayıt ol ve hemen ilanını paylaş — ücretsiz.',
     },
     en: {
       tagline: 'The New Way to Find Property in North Cyprus',
-      title: 'Find Your Dream',
-      titleHighlight: 'Home Easily.',
+      title: 'Find Your Dream', titleHighlight: 'Home Easily.',
       subtitle: 'Discover rental or sale properties, get instant info with our AI assistant.',
       rent: 'Rent', sale: 'Buy',
       searchPlaceholder: 'Nicosia, Kyrenia, Gönyeli...',
       search: 'Search',
-      trust1: 'AI Assistant', trust2: '5 Languages', trust3: 'Free to Use',
-      featuredTitle: 'Featured Listings',
-      featuredSubtitle: 'Browse the latest properties',
-      viewAll: 'View All →',
-      citiesTitle: 'Popular Cities',
-      citiesSubtitle: 'Explore the most popular areas of North Cyprus',
-      whyTitle: 'Why Evlek?',
-      whySubtitle: 'Features that simplify your North Cyprus property experience',
-      why1Title: 'AI Property Assistant', why1Desc: 'Instant answers to your questions, personalized recommendations.',
-      why2Title: '5 Language Support', why2Desc: 'Full support in Turkish, English, Russian, German and Arabic.',
-      why3Title: 'Legal Guide', why3Desc: 'Property buying process, taxes and legal info in KKTC.',
-      why4Title: 'Smart Filters', why4Desc: 'Bills included, furnished, pool — find exactly what you need.',
-      blogTitle: 'Knowledge Hub',
-      blogSubtitle: 'Guides to help you with North Cyprus real estate',
-      readMore: 'Read More →',
-      allBlog: 'All Articles →',
-      statListings: 'Active Listings',
-      statCities: 'Cities',
-      statLangs: 'Languages',
-      statAI: 'AI Assistant',
+      trust: 'AI-powered · 5 languages · Free',
+      featuredTitle: 'Featured Listings', featuredSub: 'Latest properties', viewAll: 'View All →',
+      citiesTitle: 'Popular Areas', citiesSub: 'Most searched cities in North Cyprus',
+      blogTitle: 'Knowledge Hub', blogSub: 'Guides for North Cyprus real estate', readMore: 'Read →', allBlog: 'All Articles →',
+      whyTitle: 'Why Evlek?', whySub: 'Features that simplify your property search',
+      w1t: 'AI Property Assistant', w1d: 'Instant answers, personalized recommendations.',
+      w2t: '5 Language Support', w2d: 'Full support in Turkish, English, Russian, German and Arabic.',
+      w3t: 'Legal Guide', w3d: 'Property buying process, taxes and legal info.',
+      w4t: 'Smart Filters', w4d: 'Bills included, furnished, pool — find exactly what you need.',
       ctaTitle: 'List Your Property for Free',
-      ctaSubtitle: 'Reach thousands of potential tenants and buyers.',
-      ctaButton: 'Add Listing',
-      ctaNote: 'Sign up and share your listing — it\'s free.',
+      ctaSub: 'Reach thousands of potential tenants and buyers.',
+      ctaBtn: 'Add Listing', ctaNote: 'Sign up and share your listing — it\'s free.',
     },
+  }[locale as 'tr' | 'en'] || {
+    tagline: 'The New Way to Find Property in North Cyprus',
+    title: 'Find Your Dream', titleHighlight: 'Home Easily.',
+    subtitle: 'Discover rental or sale properties, get instant info with our AI assistant.',
+    rent: 'Rent', sale: 'Buy', searchPlaceholder: 'Nicosia, Kyrenia...', search: 'Search',
+    trust: 'AI-powered · 5 languages · Free',
+    featuredTitle: 'Featured Listings', featuredSub: 'Latest properties', viewAll: 'View All →',
+    citiesTitle: 'Popular Areas', citiesSub: 'Most searched cities', blogTitle: 'Knowledge Hub',
+    blogSub: 'Guides for real estate', readMore: 'Read →', allBlog: 'All Articles →',
+    whyTitle: 'Why Evlek?', whySub: 'Features that simplify your search',
+    w1t: 'AI Assistant', w1d: 'Instant answers.', w2t: '5 Languages', w2d: 'Full multilingual support.',
+    w3t: 'Legal Guide', w3d: 'Taxes and legal info.', w4t: 'Smart Filters', w4d: 'Find what you need.',
+    ctaTitle: 'List for Free', ctaSub: 'Reach buyers and tenants.',
+    ctaBtn: 'Add Listing', ctaNote: 'Free to use.',
   };
 
-  const txt = heroTexts[locale as 'tr' | 'en'] || heroTexts.en;
-
-  const cities = [
-    { name: isTR ? 'Lefkoşa' : 'Nicosia', nameKey: 'Lefkoşa', emoji: '🏛️', color: '#1B6B93' },
-    { name: isTR ? 'Girne' : 'Kyrenia', nameKey: 'Girne', emoji: '⛵', color: '#2D8B5C' },
-    { name: isTR ? 'Gazimağusa' : 'Famagusta', nameKey: 'Gazimağusa', emoji: '🏰', color: '#D4940A' },
-    { name: isTR ? 'İskele' : 'Iskele', nameKey: 'İskele', emoji: '🏖️', color: '#1B6B93' },
-    { name: isTR ? 'Güzelyurt' : 'Guzelyurt', nameKey: 'Güzelyurt', emoji: '🍊', color: '#2D8B5C' },
-    { name: isTR ? 'Lefke' : 'Lefke', nameKey: 'Lefke', emoji: '🌿', color: '#D4940A' },
+  // Only show cities that have listings
+  const allCities = [
+    { name: isTR ? 'Lefkoşa' : 'Nicosia', key: 'Lefkoşa', emoji: '🏛️', color: '#1B6B93' },
+    { name: isTR ? 'Girne' : 'Kyrenia', key: 'Girne', emoji: '⛵', color: '#2D8B5C' },
+    { name: isTR ? 'Gazimağusa' : 'Famagusta', key: 'Gazimağusa', emoji: '🏰', color: '#D4940A' },
+    { name: isTR ? 'İskele' : 'Iskele', key: 'İskele', emoji: '🏖️', color: '#1B6B93' },
+    { name: isTR ? 'Güzelyurt' : 'Guzelyurt', key: 'Güzelyurt', emoji: '🍊', color: '#2D8B5C' },
+    { name: isTR ? 'Lefke' : 'Lefke', key: 'Lefke', emoji: '🌿', color: '#D4940A' },
   ];
+  const activeCities = allCities.filter(c => (cityCounts[c.key] || 0) > 0);
+  // If no cities have listings yet, show top 4 as placeholder
+  const displayCities = activeCities.length > 0 ? activeCities : allCities.slice(0, 4);
 
   const blogPosts = [
     { slug: 'buying-property-foreigners-guide', tr: 'Yabancılara Mülk Satın Alma Rehberi', en: 'Buying Property as a Foreigner', emoji: '🏠' },
@@ -139,7 +122,7 @@ export default function Home() {
     <div dir={dir}>
       <Navbar locale={locale} onLocaleChange={setLocale} activePage="home" />
 
-      {/* ========== HERO ========== */}
+      {/* ═══════ HERO ═══════ */}
       <section className="hero" style={{ minHeight: 'auto', padding: '120px 0 60px' }}>
         <div className="container">
           <div className="hero-split">
@@ -153,14 +136,18 @@ export default function Home() {
                 {txt.subtitle}
               </p>
               <div className="hero-type-toggle">
-                <button onClick={() => setListingType('rent')} className={`btn ${listingType === 'rent' ? 'btn-primary' : 'btn-outline'}`} style={{ borderRadius: '999px', padding: '8px 24px' }}>
+                <button onClick={() => setListingType('rent')}
+                  className={`btn ${listingType === 'rent' ? 'btn-primary' : 'btn-outline'}`}
+                  style={{ borderRadius: '999px', padding: '8px 24px' }}>
                   🔑 {txt.rent}
                 </button>
-                <button onClick={() => setListingType('sale')} className={`btn ${listingType === 'sale' ? 'btn-primary' : 'btn-outline'}`} style={{ borderRadius: '999px', padding: '8px 24px' }}>
+                <button onClick={() => setListingType('sale')}
+                  className={`btn ${listingType === 'sale' ? 'btn-primary' : 'btn-outline'}`}
+                  style={{ borderRadius: '999px', padding: '8px 24px' }}>
                   🏠 {txt.sale}
                 </button>
               </div>
-              <form className="hero-search" style={{ margin: '0 0 24px', maxWidth: '100%' }}
+              <form className="hero-search" style={{ margin: '0 0 20px', maxWidth: '100%' }}
                 onSubmit={(e) => {
                   e.preventDefault();
                   const input = e.currentTarget.querySelector('input') as HTMLInputElement;
@@ -173,12 +160,16 @@ export default function Home() {
                 <input type="text" name="search" placeholder={txt.searchPlaceholder} />
                 <button type="submit">{txt.search}</button>
               </form>
-              <div className="hero-trust-signals">
-                <span>🤖 {txt.trust1}</span>
-                <span>🌍 {txt.trust2}</span>
-                <span>✅ {txt.trust3}</span>
-              </div>
+
+              {/* Minimal trust line */}
+              <p style={{
+                fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 500,
+                letterSpacing: '0.03em',
+              }}>
+                {txt.trust}
+              </p>
             </div>
+
             <div className="hero-image-wrapper">
               <img src="/hero-villa.png" alt="North Cyprus Mediterranean Villa" />
               <div className="hero-image-badge">
@@ -189,52 +180,21 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ========== STATS BAR ========== */}
-      <section style={{ background: 'var(--bg-secondary)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
-        <div className="container">
-          <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px',
-            padding: '32px 0', textAlign: 'center',
-          }}>
-            {[
-              { value: totalListings || '—', label: txt.statListings, icon: '📋' },
-              { value: '6', label: txt.statCities, icon: '🏙️' },
-              { value: '5', label: txt.statLangs, icon: '🌍' },
-              { value: '24/7', label: txt.statAI, icon: '🤖' },
-            ].map((s) => (
-              <div key={s.label}>
-                <div style={{ fontSize: '1.8rem', fontWeight: 800, fontFamily: 'var(--font-heading)', color: 'var(--primary)', lineHeight: 1 }}>
-                  {s.icon} {s.value}
-                </div>
-                <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '4px', fontWeight: 500 }}>
-                  {s.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ========== FEATURED LISTINGS ========== */}
+      {/* ═══════ FEATURED LISTINGS ═══════ */}
       {featuredProperties.length > 0 && (
-        <section className="section" style={{ paddingTop: '60px', paddingBottom: '60px' }}>
+        <section className="section" style={{ paddingTop: '56px', paddingBottom: '56px' }}>
           <div className="container">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
               <div>
-                <h2 className="section-title" style={{ marginBottom: '4px' }}>{txt.featuredTitle}</h2>
-                <p className="section-subtitle" style={{ margin: 0 }}>{txt.featuredSubtitle}</p>
+                <h2 className="section-title" style={{ marginBottom: '2px' }}>{txt.featuredTitle}</h2>
+                <p className="section-subtitle" style={{ margin: 0 }}>{txt.featuredSub}</p>
               </div>
               <a href="/properties" className="btn btn-outline" style={{ fontSize: '0.85rem' }}>
                 {txt.viewAll}
               </a>
             </div>
-
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
-              gap: '20px',
-            }}>
-              {featuredProperties.slice(0, 6).map((p) => (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+              {featuredProperties.map((p) => (
                 <FeaturedCard key={p.id} property={p} locale={locale} />
               ))}
             </div>
@@ -242,27 +202,29 @@ export default function Home() {
         </section>
       )}
 
-      {/* ========== CITIES ========== */}
-      <section className="section" style={{ paddingTop: '60px', paddingBottom: '60px', background: 'var(--bg-secondary)' }}>
+      {/* ═══════ CITIES ═══════ */}
+      <section className="section" style={{ paddingTop: '56px', paddingBottom: '56px', background: 'var(--bg-secondary)' }}>
         <div className="container">
-          <div className="section-header" style={{ marginBottom: '32px' }}>
+          <div className="section-header" style={{ marginBottom: '28px' }}>
             <h2 className="section-title">{txt.citiesTitle}</h2>
-            <p className="section-subtitle">{txt.citiesSubtitle}</p>
+            <p className="section-subtitle">{txt.citiesSub}</p>
           </div>
-          <div className="cities-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))' }}>
-            {cities.map((city) => {
-              const count = cityCounts[city.nameKey] || 0;
+          <div className="cities-grid">
+            {displayCities.map((city) => {
+              const count = cityCounts[city.key] || 0;
               return (
-                <a key={city.name} href={`/properties?city=${city.nameKey}`} className="city-card">
+                <a key={city.name} href={`/properties?city=${city.key}`} className="city-card">
                   <span style={{ fontSize: '2rem' }}>{city.emoji}</span>
                   <span style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--text-primary)' }}>{city.name}</span>
-                  <span style={{
-                    fontSize: '0.8rem', color: count > 0 ? city.color : 'var(--text-muted)',
-                    background: count > 0 ? `${city.color}12` : 'var(--bg-darker)',
-                    padding: '3px 10px', borderRadius: '999px', fontWeight: 500,
-                  }}>
-                    {count > 0 ? `${count} ${isTR ? 'ilan' : (count === 1 ? 'listing' : 'listings')}` : (isTR ? 'Yakında' : 'Soon')}
-                  </span>
+                  {count > 0 && (
+                    <span style={{
+                      fontSize: '0.78rem', color: city.color,
+                      background: `${city.color}12`, padding: '3px 10px',
+                      borderRadius: '999px', fontWeight: 500,
+                    }}>
+                      {count} {isTR ? 'ilan' : (count === 1 ? 'listing' : 'listings')}
+                    </span>
+                  )}
                 </a>
               );
             })}
@@ -270,47 +232,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ========== WHY EVLEK ========== */}
-      <section className="section" id="features" style={{ paddingTop: '60px', paddingBottom: '60px' }}>
+      {/* ═══════ BLOG ═══════ */}
+      <section className="section" style={{ paddingTop: '56px', paddingBottom: '56px' }}>
         <div className="container">
-          <div className="section-header" style={{ marginBottom: '40px' }}>
-            <h2 className="section-title">{txt.whyTitle}</h2>
-            <p className="section-subtitle">{txt.whySubtitle}</p>
-          </div>
-          <div className="why-grid">
-            {[
-              { icon: '🤖', title: txt.why1Title, desc: txt.why1Desc, color: '#1B6B93' },
-              { icon: '🌍', title: txt.why2Title, desc: txt.why2Desc, color: '#2D8B5C' },
-              { icon: '⚖️', title: txt.why3Title, desc: txt.why3Desc, color: '#D4940A' },
-              { icon: '🎯', title: txt.why4Title, desc: txt.why4Desc, color: '#1B6B93' },
-            ].map((f) => (
-              <div key={f.title} className="why-card">
-                <div style={{
-                  width: '48px', height: '48px', background: `${f.color}12`,
-                  borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '1.5rem', margin: '0 auto 14px',
-                }}>{f.icon}</div>
-                <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '6px', color: 'var(--text-primary)' }}>{f.title}</h3>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ========== BLOG PREVIEW ========== */}
-      <section className="section" style={{ paddingTop: '60px', paddingBottom: '60px', background: 'var(--bg-secondary)' }}>
-        <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px' }}>
             <div>
-              <h2 className="section-title" style={{ marginBottom: '4px' }}>{txt.blogTitle}</h2>
-              <p className="section-subtitle" style={{ margin: 0 }}>{txt.blogSubtitle}</p>
+              <h2 className="section-title" style={{ marginBottom: '2px' }}>{txt.blogTitle}</h2>
+              <p className="section-subtitle" style={{ margin: 0 }}>{txt.blogSub}</p>
             </div>
             <a href="/blog" className="btn btn-outline" style={{ fontSize: '0.85rem' }}>
               {txt.allBlog}
             </a>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
             {blogPosts.map((post) => (
               <a key={post.slug} href={`/blog/${post.slug}`}
                 style={{
@@ -334,21 +268,49 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ========== CTA ========== */}
+      {/* ═══════ WHY EVLEK ═══════ */}
+      <section className="section" id="features" style={{ paddingTop: '56px', paddingBottom: '56px', background: 'var(--bg-secondary)' }}>
+        <div className="container">
+          <div className="section-header" style={{ marginBottom: '36px' }}>
+            <h2 className="section-title">{txt.whyTitle}</h2>
+            <p className="section-subtitle">{txt.whySub}</p>
+          </div>
+          <div className="why-grid">
+            {[
+              { icon: '🤖', title: txt.w1t, desc: txt.w1d, color: '#1B6B93' },
+              { icon: '🌍', title: txt.w2t, desc: txt.w2d, color: '#2D8B5C' },
+              { icon: '⚖️', title: txt.w3t, desc: txt.w3d, color: '#D4940A' },
+              { icon: '🎯', title: txt.w4t, desc: txt.w4d, color: '#1B6B93' },
+            ].map((f) => (
+              <div key={f.title} className="why-card">
+                <div style={{
+                  width: '48px', height: '48px', background: `${f.color}12`,
+                  borderRadius: '12px', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', fontSize: '1.5rem', margin: '0 auto 14px',
+                }}>{f.icon}</div>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '6px', color: 'var(--text-primary)' }}>{f.title}</h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════ CTA ═══════ */}
       <section className="cta-section">
         <div className="container">
           <div className="cta-box">
             <h2>{txt.ctaTitle}</h2>
-            <p>{txt.ctaSubtitle}</p>
+            <p>{txt.ctaSub}</p>
             <a href="/add-property" className="btn btn-lg" style={{ background: 'white', color: 'var(--primary-dark)', fontWeight: 700, padding: '14px 36px' }}>
-              {txt.ctaButton}
+              {txt.ctaBtn}
             </a>
             <div className="cta-note">{txt.ctaNote}</div>
           </div>
         </div>
       </section>
 
-      {/* ========== FOOTER ========== */}
+      {/* ═══════ FOOTER ═══════ */}
       <footer className="footer">
         <div className="container">
           <div className="footer-grid">
@@ -389,12 +351,7 @@ export default function Home() {
             <div style={{ display: 'flex', gap: '8px' }}>
               {locales.map((l) => (
                 <button key={l} onClick={() => setLocale(l)} className="btn btn-ghost"
-                  style={{
-                    padding: '4px 8px', fontSize: '0.8rem',
-                    opacity: locale === l ? 1 : 0.5,
-                    borderBottom: locale === l ? '2px solid var(--primary)' : 'none',
-                    borderRadius: 0,
-                  }}>
+                  style={{ padding: '4px 8px', fontSize: '0.8rem', opacity: locale === l ? 1 : 0.5, borderBottom: locale === l ? '2px solid var(--primary)' : 'none', borderRadius: 0 }}>
                   {localeFlags[l]}
                 </button>
               ))}
@@ -409,7 +366,7 @@ export default function Home() {
   );
 }
 
-/* ========== FEATURED PROPERTY CARD ========== */
+/* ═══════ FEATURED CARD ═══════ */
 function FeaturedCard({ property, locale }: { property: Property; locale: Locale }) {
   const isTR = locale === 'tr';
   const title = isTR ? property.title_tr : property.title_en;
@@ -430,12 +387,11 @@ function FeaturedCard({ property, locale }: { property: Property; locale: Locale
     <a href={`/properties/${property.id}`} style={{
       background: 'var(--bg-card)', border: '1px solid var(--border)',
       borderRadius: 'var(--radius-lg)', overflow: 'hidden',
-      transition: 'all 0.25s ease', display: 'block', textDecoration: 'none',
+      transition: 'all 0.25s ease', display: 'block',
     }}
       onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = 'var(--shadow-lg)'; }}
       onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}
     >
-      {/* Image */}
       <div style={{ height: '200px', background: 'var(--bg-darker)', position: 'relative', overflow: 'hidden' }}>
         {photo ? (
           <img src={photo} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -444,29 +400,22 @@ function FeaturedCard({ property, locale }: { property: Property; locale: Locale
             {icon}
           </div>
         )}
-        {/* Type badge */}
         <div style={{
           position: 'absolute', top: '12px', left: '12px',
-          background: isRent ? 'rgba(27, 107, 147, 0.9)' : 'rgba(45, 139, 92, 0.9)',
+          background: isRent ? 'rgba(27,107,147,0.9)' : 'rgba(45,139,92,0.9)',
           color: 'white', padding: '4px 12px', borderRadius: '999px',
           fontSize: '0.75rem', fontWeight: 700, backdropFilter: 'blur(8px)',
         }}>
           {isRent ? (isTR ? '🔑 Kiralık' : '🔑 Rent') : (isTR ? '🏠 Satılık' : '🏠 Sale')}
         </div>
       </div>
-
-      {/* Content */}
       <div style={{ padding: '16px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-          <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.3, flex: 1 }}>
-            {title}
-          </h3>
-        </div>
-
+        <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.3, marginBottom: '8px' }}>
+          {title}
+        </h3>
         <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--primary)', marginBottom: '8px', fontFamily: 'var(--font-heading)' }}>
           {formatted}{isRent ? (isTR ? '/ay' : '/mo') : ''}
         </div>
-
         <div style={{ display: 'flex', gap: '12px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
           <span>📍 {property.city}{p.district ? `, ${p.district}` : ''}</span>
           <span>{icon} {roomConfig}</span>
