@@ -135,51 +135,14 @@ export default function Home() {
               <p className="hero-subtitle" style={{ textAlign: 'left', margin: '0 0 28px' }}>
                 {txt.subtitle}
               </p>
-              <div className="hero-type-toggle">
-                <button onClick={() => setListingType('rent')}
-                  className={`btn ${listingType === 'rent' ? 'btn-primary' : 'btn-outline'}`}
-                  style={{ borderRadius: '999px', padding: '8px 24px' }}>
-                  🔑 {txt.rent}
-                </button>
-                <button onClick={() => setListingType('sale')}
-                  className={`btn ${listingType === 'sale' ? 'btn-primary' : 'btn-outline'}`}
-                  style={{ borderRadius: '999px', padding: '8px 24px' }}>
-                  🏠 {txt.sale}
-                </button>
-              </div>
-              <form className="hero-search" style={{ margin: '0 0 20px', maxWidth: '100%' }}
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const input = e.currentTarget.querySelector('input') as HTMLInputElement;
-                  const search = input?.value?.trim() || '';
-                  const params = new URLSearchParams();
-                  params.set('type', listingType);
-                  if (search) params.set('search', search);
-                  window.location.href = `/properties?${params.toString()}`;
-                }}>
-                <input type="text" name="search" placeholder={txt.searchPlaceholder} />
-                <button type="submit">{txt.search}</button>
-              </form>
 
-              {/* Quick actions for target audiences */}
-              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                <a href="/properties?type=rent" style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '6px',
-                  padding: '8px 16px', borderRadius: '999px',
-                  background: 'rgba(27,107,147,0.08)', color: 'var(--primary)',
-                  fontSize: '0.82rem', fontWeight: 600, transition: 'all 0.2s',
-                  border: '1px solid rgba(27,107,147,0.15)',
-                }}>
-                  🎓 {isTR ? 'Kiralık Daire Arıyorum' : 'Find a Rental'}
+              {/* Two clear actions — no redundancy with navbar */}
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                <a href="/properties" className="btn btn-primary" style={{ padding: '12px 28px', fontSize: '0.95rem' }}>
+                  {isTR ? 'İlanları Keşfet' : 'Browse Listings'}
                 </a>
-                <a href="/add-property" style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '6px',
-                  padding: '8px 16px', borderRadius: '999px',
-                  background: 'rgba(45,139,92,0.08)', color: 'var(--success)',
-                  fontSize: '0.82rem', fontWeight: 600, transition: 'all 0.2s',
-                  border: '1px solid rgba(45,139,92,0.15)',
-                }}>
-                  🏢 {isTR ? 'Ücretsiz İlan Ver' : 'List for Free'}
+                <a href="/add-property" className="btn btn-outline" style={{ padding: '12px 28px', fontSize: '0.95rem' }}>
+                  {isTR ? 'Ücretsiz İlan Ver' : 'List for Free'}
                 </a>
               </div>
             </div>
