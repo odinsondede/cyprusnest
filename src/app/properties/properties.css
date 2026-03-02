@@ -530,18 +530,13 @@
         right: 16px;
     }
 
-    /* Add-property form mobile fixes */
-    .container form div[style*="gridTemplateColumns: '1fr 1fr 1fr 1fr'"],
-    .container form div[style*="grid-template-columns"] {
+    /* Add-property form mobile fixes — override inline grid styles */
+    .container [style*="grid"] {
         grid-template-columns: 1fr 1fr !important;
     }
 
     .container form {
         padding: 16px !important;
-    }
-
-    .container form div[style*="gridTemplateColumns: '1fr auto 1fr 1fr'"] {
-        grid-template-columns: 1fr 1fr !important;
     }
 }
 

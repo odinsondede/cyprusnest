@@ -12,6 +12,7 @@ import { convertPrice, formatCurrency, currencies, type Currency } from '@/lib/c
 import Navbar from '@/components/Navbar';
 import ChatbotWidget from '@/components/ChatbotWidget';
 import AuthModal from '@/components/AuthModal';
+import { PropertyGridSkeleton } from '@/components/LoadingSkeleton';
 
 function PropertyCard({ property, locale, isFav, onToggleFav, displayCurrency }: { property: Property; locale: Locale; isFav: boolean; onToggleFav: () => void; displayCurrency: Currency }) {
     const title = locale === 'tr' ? property.title_tr : property.title_en;
@@ -419,10 +420,7 @@ function PropertiesContent() {
 
                     {/* Property Grid */}
                     {loading ? (
-                        <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
-                            <div style={{ fontSize: '2rem', marginBottom: '12px' }}>⏳</div>
-                            <p>{locale === 'tr' ? 'İlanlar yükleniyor...' : 'Loading properties...'}</p>
-                        </div>
+                        <PropertyGridSkeleton count={6} />
                     ) : filteredProperties.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
                             <div style={{ fontSize: '2rem', marginBottom: '12px' }}>🔍</div>
