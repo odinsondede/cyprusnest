@@ -74,6 +74,7 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <head>
+        <meta name="google-site-verification" content="S0IW-GRqZ-9eITeQ4DHNYJ4fmOmYSQ9Q6-68oeVbIgI" />
         {/* Schema.org — Organization */}
         <script
           type="application/ld+json"
