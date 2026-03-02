@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from '@vercel/analytics/next';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -94,7 +95,9 @@ export default function RootLayout({
         />
       </head>
       <body>
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
         <Analytics />
       </body>
     </html>
